@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <LangVersion>13</LangVersion>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Platforms>x64</Platforms>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+    <ItemGroup>
+        <!-- Copy the Rust library, if changed, to the current output folder. -->
+        <Content Include="..\..\Rust\target\release\millisecond_ticker.dll">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="NUnit" Version="4.3.2"/>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1"/>
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Tickers\Simon.Tickers.csproj"/>
+    </ItemGroup>
+</Project>

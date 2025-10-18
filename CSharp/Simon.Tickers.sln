@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simon.Tickers", "Tickers\Simon.Tickers.csproj", "{840CA5E4-51E4-48FF-815C-E34A2163A4E5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simon.Tickers.Tests", "Tests\Simon.Tickers.Tests.csproj", "{45CB73FC-D2BB-4B41-B8E7-7EF5C65DB6F2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Release|x64 = Release|x64
+		Debug|x64 = Debug|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{840CA5E4-51E4-48FF-815C-E34A2163A4E5}.Release|x64.ActiveCfg = Release|x64
+		{840CA5E4-51E4-48FF-815C-E34A2163A4E5}.Release|x64.Build.0 = Release|x64
+		{840CA5E4-51E4-48FF-815C-E34A2163A4E5}.Debug|x64.ActiveCfg = Debug|x64
+		{840CA5E4-51E4-48FF-815C-E34A2163A4E5}.Debug|x64.Build.0 = Debug|x64
+		{45CB73FC-D2BB-4B41-B8E7-7EF5C65DB6F2}.Release|x64.ActiveCfg = Release|x64
+		{45CB73FC-D2BB-4B41-B8E7-7EF5C65DB6F2}.Release|x64.Build.0 = Release|x64
+		{45CB73FC-D2BB-4B41-B8E7-7EF5C65DB6F2}.Debug|x64.ActiveCfg = Debug|x64
+		{45CB73FC-D2BB-4B41-B8E7-7EF5C65DB6F2}.Debug|x64.Build.0 = Debug|x64
+	EndGlobalSection
+EndGlobal
