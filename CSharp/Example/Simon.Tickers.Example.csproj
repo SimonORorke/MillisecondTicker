@@ -9,7 +9,7 @@
 
     <ItemGroup>
         <!-- Copy the Rust library, if changed, to the current output folder. -->
-        <Content Include="..\..\Rust\target\release\millisecond_ticker.dll">
+        <Content Include="..\..\Rust\millisecond_ticker\target\release\millisecond_ticker.dll">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
     </ItemGroup>
