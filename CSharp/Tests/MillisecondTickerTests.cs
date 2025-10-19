@@ -5,7 +5,7 @@ namespace Simon.Tickers.Tests;
 
 /// <summary>
 ///   Results are variable. So, rather than asserting, results are just written to the
-///   test outputs.
+///   test output.
 ///   The <see cref="SleepWhileTicking" /> and <see cref="CountTicks" /> tests show that
 ///   the Rust millisecond ticker is very accurate.
 ///   The <see cref="Delay" /> and <see cref="Sleep" /> tests show that
@@ -15,10 +15,16 @@ namespace Simon.Tickers.Tests;
 /// </summary>
 [TestFixture]
 public class TickerTests {
-  private const int RustTestMilliseconds = 10;
+  // For more accurate timing, allowing for fixed overheads,
+  // run the MillisecondTicker tests for longer.
   // private const int RustTestMilliseconds = 1000 * 60; // 1 minute 
+  private const int RustTestMilliseconds = 10;
+
   private long _tickCount; // Thread safe counter.
 
+  /// <summary>
+  ///   Tests the accuracy of <see cref="MillisecondTicker" /> by counting its ticks.
+  /// </summary>
   [Test]
   public async Task CountTicks() {
     await TestContext.Progress.WriteLineAsync(
@@ -37,12 +43,16 @@ public class TickerTests {
     }
     // For the most accurate timing, stop the stopwatch before calling Stop() on the
     // ticker.
-    stopwatch.Stop(); 
+    stopwatch.Stop();
     ticker.Stop();
     await TestContext.Progress.WriteLineAsync(
       $"    Elapsed milliseconds on Stop = {stopwatch.ElapsedMilliseconds}.");
   }
 
+  /// <summary>
+  ///   Tests the accuracy of <see cref="Task.Delay(int)" />, for comparison with
+  ///   <see cref="MillisecondTicker" />.
+  /// </summary>
   [Test]
   public async Task Delay() {
     const int expectedMilliseconds = 10;
@@ -60,6 +70,10 @@ public class TickerTests {
       $"Tested Delay, actual was {stopwatch.ElapsedMilliseconds} milliseconds.");
   }
 
+  /// <summary>
+  ///   Tests the accuracy of <see cref="Thread.Sleep(int)" />, for comparison with
+  ///   <see cref="MillisecondTicker" />.
+  /// </summary>
   [Test]
   public void Sleep() {
     const int expectedMilliseconds = 10;
@@ -77,6 +91,9 @@ public class TickerTests {
       $"Tested Sleep, actual was {stopwatch.ElapsedMilliseconds} milliseconds.");
   }
 
+  /// <summary>
+  ///   Tests the accuracy of <see cref="MillisecondTicker" /> by sleeping while it ticks.
+  /// </summary>
   [Test]
   public void SleepWhileTicking() {
     TestContext.Progress.WriteLine(
@@ -95,7 +112,7 @@ public class TickerTests {
     long tickCount1 = Interlocked.Read(ref _tickCount);
     // Check that Stop works.
     const int millisecondsWaitAfterStop = 5;
-    Thread.Sleep(millisecondsWaitAfterStop); 
+    Thread.Sleep(millisecondsWaitAfterStop);
     long tickCount2 = Interlocked.Read(ref _tickCount);
     TestContext.Progress.WriteLine(
       $"    Tick count on Stop = {tickCount1}. " +
@@ -104,7 +121,7 @@ public class TickerTests {
     TestContext.Progress.WriteLine(
       $"    Tick count after {millisecondsWaitAfterStop} milliseconds = {tickCount2}.");
   }
-  
+
   private void OnTick() {
     Interlocked.Increment(ref _tickCount);
   }
