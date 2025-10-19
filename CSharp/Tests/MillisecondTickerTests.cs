@@ -22,6 +22,10 @@ public class TickerTests {
 
   private long _tickCount; // Thread safe counter.
 
+  private StringWriter IntervalLog { get; } = new StringWriter();
+  private int IntervalMilliseconds { get; set; }
+  private Stopwatch Stopwatch { get; } = new Stopwatch();
+
   /// <summary>
   ///   Tests the accuracy of <see cref="MillisecondTicker" /> by counting its ticks.
   /// </summary>
@@ -30,9 +34,8 @@ public class TickerTests {
     await TestContext.Progress.WriteLineAsync(
       $"Test TickerTests.CountTicks: Running test for {RustTestMilliseconds} ticks.");
     Interlocked.Exchange(ref _tickCount, 0);
-    var ticker = new MillisecondTicker(OnTick);
-    var stopwatch = new Stopwatch();
-    stopwatch.Start();
+    var ticker = new MillisecondTicker(OnTickIncrementTickCount);
+    Stopwatch.Restart();
     ticker.Start(1);
     while (true) {
       await Task.Delay(1);
@@ -41,12 +44,12 @@ public class TickerTests {
         break;
       }
     }
-    // For the most accurate timing, stop the stopwatch before calling Stop() on the
+    // For the most accurate timing, stop the Stopwatch before calling Stop() on the
     // ticker.
-    stopwatch.Stop();
+    Stopwatch.Stop();
     ticker.Stop();
     await TestContext.Progress.WriteLineAsync(
-      $"    Elapsed milliseconds on Stop = {stopwatch.ElapsedMilliseconds}.");
+      $"    Elapsed milliseconds on Stop = {Stopwatch.ElapsedMilliseconds}.");
   }
 
   /// <summary>
@@ -56,18 +59,51 @@ public class TickerTests {
   [Test]
   public async Task Delay() {
     const int expectedMilliseconds = 10;
-    Console.WriteLine(
+    await TestContext.Progress.WriteLineAsync(
       $"Testing Delay, expecting {expectedMilliseconds} milliseconds.");
     int count = 0;
-    var stopwatch = new Stopwatch();
-    stopwatch.Start();
+    Stopwatch.Restart();
     while (count < expectedMilliseconds) {
       await Task.Delay(1);
       count++;
     }
-    stopwatch.Stop();
-    Console.WriteLine(
-      $"Tested Delay, actual was {stopwatch.ElapsedMilliseconds} milliseconds.");
+    Stopwatch.Stop();
+    await TestContext.Progress.WriteLineAsync(
+      $"Tested Delay, actual was {Stopwatch.ElapsedMilliseconds} milliseconds.");
+  }
+
+  /// <summary>
+  ///   Measures the intervals between ticks of the <see cref="MillisecondTicker" />,
+  ///   to get an idea of how steady they are.
+  /// </summary>
+  /// <remarks>
+  ///   After measuring the actual intervals between ticks with various specified
+  ///   intervals, I conclude that Interval is adequate for what I need.
+  ///   I found that the absolute differences between expected and measured intervals
+  ///   increased little as I varied the specified interval duration.
+  ///   So I think the differences must be mostly due to test artefacts.
+  ///   I think I should be able to get more consistent tick durations if I were to
+  ///   set MissedTickBehavior to Delay. That would be more like a steady clock.
+  ///   However, on due consideration, I've decided that it's best for my musical purpose
+  ///   to leave MissedTickBehavior at its default, Burst. That will speed up ticks,
+  ///   if necessary, to keep the elapsed time of all ticks as expected while still
+  ///   notifying every tick. That would be more like a system clock.
+  /// </remarks>
+  [Test]
+  public void MeasureTickIntervals() {
+    IntervalMilliseconds = 1;
+    // The first tick will happen "immediately", so its interval will be short.
+    // However, as we will sleep for 10 intervals plus a millisecond, we will actually
+    // get (at least) 11 measurements, so 10 that are relevant.
+    int totalMilliseconds = IntervalMilliseconds * 10;
+    TestContext.Progress.WriteLine(
+      $"Testing MeasureTickIntervals for {totalMilliseconds} milliseconds.");
+    var ticker = new MillisecondTicker(OnTickMeasureInterval);
+    Stopwatch.Restart();
+    ticker.Start(IntervalMilliseconds);
+    Thread.Sleep(totalMilliseconds + 1);
+    ticker.Stop();
+    TestContext.Progress.WriteLine(IntervalLog.ToString());
   }
 
   /// <summary>
@@ -77,18 +113,17 @@ public class TickerTests {
   [Test]
   public void Sleep() {
     const int expectedMilliseconds = 10;
-    Console.WriteLine(
+    TestContext.Progress.WriteLine(
       $"Testing Sleep, expecting {expectedMilliseconds} milliseconds.");
     int count = 0;
-    var stopwatch = new Stopwatch();
-    stopwatch.Start();
+    Stopwatch.Restart();
     while (count < expectedMilliseconds) {
       Thread.Sleep(1);
       count++;
     }
-    stopwatch.Stop();
-    Console.WriteLine(
-      $"Tested Sleep, actual was {stopwatch.ElapsedMilliseconds} milliseconds.");
+    Stopwatch.Stop();
+    TestContext.Progress.WriteLine(
+      $"Tested Sleep, actual was {Stopwatch.ElapsedMilliseconds} milliseconds.");
   }
 
   /// <summary>
@@ -99,15 +134,14 @@ public class TickerTests {
     TestContext.Progress.WriteLine(
       $"Test TickerTests.SleepWhileTicking: Running test for {RustTestMilliseconds} milliseconds.");
     Interlocked.Exchange(ref _tickCount, 0);
-    var ticker = new MillisecondTicker(OnTick);
-    // Start a stopwatch, as that will be more accurate than Thread.Sleep().
-    var stopwatch = new Stopwatch();
-    stopwatch.Start();
+    var ticker = new MillisecondTicker(OnTickIncrementTickCount);
+    // Start a Stopwatch, as that will be more accurate than Thread.Sleep().
+    Stopwatch.Restart();
     ticker.Start(1);
     Thread.Sleep(RustTestMilliseconds);
-    // For the most accurate timing, stop the stopwatch before calling Stop() on the
+    // For the most accurate timing, stop the Stopwatch before calling Stop() on the
     // ticker.
-    stopwatch.Stop();
+    Stopwatch.Stop();
     ticker.Stop();
     long tickCount1 = Interlocked.Read(ref _tickCount);
     // Check that Stop works.
@@ -116,13 +150,21 @@ public class TickerTests {
     long tickCount2 = Interlocked.Read(ref _tickCount);
     TestContext.Progress.WriteLine(
       $"    Tick count on Stop = {tickCount1}. " +
-      $"Stopwatch: {stopwatch.ElapsedMilliseconds} milliseconds.");
+      $"Stopwatch: {Stopwatch.ElapsedMilliseconds} milliseconds.");
     // There is usually 1 more tick after calling Stop() on the ticker.
     TestContext.Progress.WriteLine(
       $"    Tick count after {millisecondsWaitAfterStop} milliseconds = {tickCount2}.");
   }
 
-  private void OnTick() {
+  private void OnTickIncrementTickCount() {
     Interlocked.Increment(ref _tickCount);
+  }
+
+  private void OnTickMeasureInterval() {
+    Stopwatch.Stop();
+    IntervalLog.WriteLine(
+      $"    Expected {IntervalMilliseconds} milliseconds; " +
+      $"actual {Stopwatch.ElapsedMilliseconds} milliseconds.");
+    Stopwatch.Restart();
   }
 }
