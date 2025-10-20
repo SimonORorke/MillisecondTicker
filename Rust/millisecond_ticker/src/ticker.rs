@@ -46,8 +46,11 @@ impl Ticker {
             ticker.set_missed_tick_behavior(missed_tick_behavior);
             while running.load(Ordering::SeqCst) {
                 ticker.tick().await;
+                // Call back asynchronously.
+                // Tests show that to be more accurate than synchronous callbacks.
                 let callback_clone = callback.clone();
                 crate::RUNTIME.spawn(async move { callback_clone() });
+                // callback();
             }
         }));
     }

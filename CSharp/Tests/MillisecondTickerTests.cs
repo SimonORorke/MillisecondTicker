@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using NUnit.Framework;
 
 namespace Simon.Tickers.Tests;
@@ -98,26 +99,35 @@ public class TickerTests {
   ///   if necessary, to keep the elapsed time of all ticks as expected while still
   ///   notifying every tick. That would be more like a system clock.
   /// </remarks>
-  [Test, Explicit]
+  [Test, Explicit, ExcludeFromCodeCoverage]
   public void MeasureTickIntervals() {
-    IntervalMilliseconds = 1;
-    MissedTickBehavior = MissedTickBehavior.Burst;
-    // MissedTickBehavior = MissedTickBehavior.Delay;
-    // MissedTickBehavior = MissedTickBehavior.Skip;
+    MeasureTickIntervals(1, MissedTickBehavior.Burst, 10);
+    MeasureTickIntervals(10, MissedTickBehavior.Burst, 10);
+    MeasureTickIntervals(100, MissedTickBehavior.Burst, 10);
+    MeasureTickIntervals(1000, MissedTickBehavior.Burst, 10);
+  }
+
+  [ExcludeFromCodeCoverage]
+  private void MeasureTickIntervals(
+    int intervalMilliseconds, MissedTickBehavior missedTickBehavior, int waitFactor) {
+    IntervalMilliseconds = intervalMilliseconds;
+    MissedTickBehavior = missedTickBehavior;
     // The first tick will happen "immediately", so its interval will be short.
-    // However, as we will sleep for 10 intervals plus a millisecond, we will actually
+    // However, if we will sleep for 10 intervals plus a millisecond, we will actually
     // get (at least) 11 measurements, so 10 that are relevant,
     // unless MissedTickBehavior is Delay. 
-    int totalMilliseconds = IntervalMilliseconds * 10;
-    // int totalMilliseconds = IntervalMilliseconds * 1000;
+    int waitMilliseconds = IntervalMilliseconds * waitFactor + 1;
     TestContext.Progress.WriteLine(
-      $"Testing MeasureTickIntervals for {totalMilliseconds} milliseconds.");
+      $"MeasureTickIntervals: testing {IntervalMilliseconds} millisecond interval " +
+      $"with missed tick behavior {MissedTickBehavior} " +
+      $"for {waitMilliseconds} milliseconds.");
     var ticker = new MillisecondTicker(OnTickMeasureInterval);
     Stopwatch.Restart();
     ticker.Start(IntervalMilliseconds, MissedTickBehavior);
-    Thread.Sleep(totalMilliseconds + 1);
+    Thread.Sleep(waitMilliseconds);
     ticker.Stop();
     TestContext.Progress.WriteLine(IntervalLog.ToString());
+    IntervalLog.Flush();
   }
 
   /// <summary>
