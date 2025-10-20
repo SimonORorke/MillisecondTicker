@@ -23,10 +23,11 @@ public class TickerTests {
 
   private long _tickCount; // Thread safe counter.
 
-  private StringWriter IntervalLog { get; } = new StringWriter();
+  private StringWriter IntervalLog { get; set; } = null!;
   private int IntervalMilliseconds { get; set; }
-  private MissedTickBehavior MissedTickBehavior { get; set; }
   private Stopwatch Stopwatch { get; } = new Stopwatch();
+  private MillisecondTicker Ticker { get; set; } = null!;
+
 
   /// <summary>
   ///   Tests the accuracy of <see cref="MillisecondTicker" /> by counting its ticks.
@@ -82,36 +83,26 @@ public class TickerTests {
 
   /// <summary>
   ///   Measures the intervals between ticks of the <see cref="MillisecondTicker" />,
-  ///   to get an idea of how steady they are. No data is written to the log
-  ///   if followed by other tests.  So this must be run individually, hence the
-  ///   [Explicit] attribute.
+  ///   to get an idea of how steady they are.
   /// </summary>
   /// <remarks>
-  ///   After measuring the actual intervals between ticks with various specified
-  ///   intervals, I conclude that Interval is adequate for what I need.
-  ///   I found that the absolute differences between expected and measured intervals
-  ///   increased little as I varied the specified interval duration.
-  ///   So I think the differences must be mostly due to test artefacts.
-  ///   I think I should be able to get more consistent tick durations if I were to
-  ///   set MissedTickBehavior to Delay. That would be more like a steady clock.
-  ///   However, on due consideration, I've decided that it's best for my musical purpose
-  ///   to leave MissedTickBehavior at its default, Burst. That will speed up ticks,
-  ///   if necessary, to keep the elapsed time of all ticks as expected while still
-  ///   notifying every tick. That would be more like a system clock.
+  ///   No data is written to the log
+  ///   if followed by other tests.  So this must be run individually, hence the
+  ///   [Explicit] attribute.
   /// </remarks>
   [Test, Explicit, ExcludeFromCodeCoverage]
   public void MeasureTickIntervals() {
-    MeasureTickIntervals(1, MissedTickBehavior.Burst, 10);
-    MeasureTickIntervals(10, MissedTickBehavior.Burst, 10);
-    MeasureTickIntervals(100, MissedTickBehavior.Burst, 10);
-    MeasureTickIntervals(1000, MissedTickBehavior.Burst, 10);
+    Ticker = new MillisecondTicker(OnTickMeasureInterval);
+    MeasureTickIntervals(1, 100);
+    MeasureTickIntervals(10, 100);
+    // MeasureTickIntervals(100, 20);
+    // MeasureTickIntervals(1000, 20);
   }
 
   [ExcludeFromCodeCoverage]
   private void MeasureTickIntervals(
-    int intervalMilliseconds, MissedTickBehavior missedTickBehavior, int waitFactor) {
+    int intervalMilliseconds, int waitFactor) {
     IntervalMilliseconds = intervalMilliseconds;
-    MissedTickBehavior = missedTickBehavior;
     // The first tick will happen "immediately", so its interval will be short.
     // However, if we will sleep for 10 intervals plus a millisecond, we will actually
     // get (at least) 11 measurements, so 10 that are relevant,
@@ -119,15 +110,15 @@ public class TickerTests {
     int waitMilliseconds = IntervalMilliseconds * waitFactor + 1;
     TestContext.Progress.WriteLine(
       $"MeasureTickIntervals: testing {IntervalMilliseconds} millisecond interval " +
-      $"with missed tick behavior {MissedTickBehavior} " +
       $"for {waitMilliseconds} milliseconds.");
-    var ticker = new MillisecondTicker(OnTickMeasureInterval);
+    IntervalLog = new StringWriter();
+    // Ticker = new MillisecondTicker(OnTickMeasureInterval);
     Stopwatch.Restart();
-    ticker.Start(IntervalMilliseconds, MissedTickBehavior);
+    Ticker.Start(IntervalMilliseconds);
     Thread.Sleep(waitMilliseconds);
-    ticker.Stop();
+    Ticker.Stop();
+    Stopwatch.Stop();
     TestContext.Progress.WriteLine(IntervalLog.ToString());
-    IntervalLog.Flush();
   }
 
   /// <summary>
@@ -187,9 +178,8 @@ public class TickerTests {
   private void OnTickMeasureInterval() {
     Stopwatch.Stop();
     IntervalLog.WriteLine(
-      $"    Expected {IntervalMilliseconds} milliseconds; " +
-      $"actual {Stopwatch.ElapsedMilliseconds} milliseconds; " +
-      $"missed tick behavior {MissedTickBehavior}.");
+      $"Expected {IntervalMilliseconds} milliseconds; " +
+      $"actual {Stopwatch.ElapsedMilliseconds} milliseconds.");
     Stopwatch.Restart();
   }
 }
