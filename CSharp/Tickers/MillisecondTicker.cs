@@ -37,11 +37,14 @@ public partial class MillisecondTicker {
   /// </summary>
   /// <param name="millisecondsInterval">Milliseconds between ticks.</param>
   /// <param name="callback">Callback to run when the ticker ticks.</param>
+  /// <param name="missedTickBehavior">
+  ///   The behavior required when a tick is missed.
+  /// </param>
   [LibraryImport("millisecond_ticker")]
   [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
   private static partial void start_ticker(
-    int millisecondsInterval,
-    CallbackDelegate callback);
+    ulong millisecondsInterval,
+    CallbackDelegate callback, byte missedTickBehavior);
 
   /// <summary>
   ///   Rust function to stop the ticker.
@@ -54,8 +57,20 @@ public partial class MillisecondTicker {
   ///   Starts the ticker.
   /// </summary>
   /// <param name="millisecondsInterval">Milliseconds between ticks.</param>
-  public void Start(int millisecondsInterval) {
-    start_ticker(millisecondsInterval, _callbackDelegate);
+  /// <param name="missedTickBehavior">
+  ///   The behavior required when a tick is missed. The default is
+  ///   <see cref="MissedTickBehavior.Burst" />: tick as fast as possible until
+  ///   caught up.
+  /// </param>
+  public void Start(int millisecondsInterval, 
+    MissedTickBehavior missedTickBehavior = MissedTickBehavior.Burst) {
+    if (millisecondsInterval < 1) {
+      throw new ArgumentException(
+        $"{nameof(millisecondsInterval)} {millisecondsInterval} is invalid. " +
+        $"It must be positive.");
+    }
+    start_ticker((ulong)millisecondsInterval, _callbackDelegate, 
+      (byte)missedTickBehavior);
     IsRunning = true;
   }
 

@@ -17,13 +17,14 @@ namespace Simon.Tickers.Tests;
 public class TickerTests {
   // For more accurate timing, allowing for fixed overheads,
   // run the MillisecondTicker tests for longer.
-  // private const int RustTestMilliseconds = 1000 * 60; // 1 minute 
-  private const int RustTestMilliseconds = 10;
+  private const int RustTestMilliseconds = 1000 * 60; // 1 minute 
+  // private const int RustTestMilliseconds = 10;
 
   private long _tickCount; // Thread safe counter.
 
   private StringWriter IntervalLog { get; } = new StringWriter();
   private int IntervalMilliseconds { get; set; }
+  private MissedTickBehavior MissedTickBehavior { get; set; }
   private Stopwatch Stopwatch { get; } = new Stopwatch();
 
   /// <summary>
@@ -72,9 +73,17 @@ public class TickerTests {
       $"Tested Delay, actual was {Stopwatch.ElapsedMilliseconds} milliseconds.");
   }
 
+  [Test]
+  public void InvalidInterval() {
+    var ticker = new MillisecondTicker(OnTickIncrementTickCount);
+    Assert.Throws<ArgumentException>(() => ticker.Start(0));
+  }
+
   /// <summary>
   ///   Measures the intervals between ticks of the <see cref="MillisecondTicker" />,
-  ///   to get an idea of how steady they are.
+  ///   to get an idea of how steady they are. No data is written to the log
+  ///   if followed by other tests.  So this must be run individually, hence the
+  ///   [Explicit] attribute.
   /// </summary>
   /// <remarks>
   ///   After measuring the actual intervals between ticks with various specified
@@ -89,18 +98,23 @@ public class TickerTests {
   ///   if necessary, to keep the elapsed time of all ticks as expected while still
   ///   notifying every tick. That would be more like a system clock.
   /// </remarks>
-  [Test]
+  [Test, Explicit]
   public void MeasureTickIntervals() {
     IntervalMilliseconds = 1;
+    MissedTickBehavior = MissedTickBehavior.Burst;
+    // MissedTickBehavior = MissedTickBehavior.Delay;
+    // MissedTickBehavior = MissedTickBehavior.Skip;
     // The first tick will happen "immediately", so its interval will be short.
     // However, as we will sleep for 10 intervals plus a millisecond, we will actually
-    // get (at least) 11 measurements, so 10 that are relevant.
+    // get (at least) 11 measurements, so 10 that are relevant,
+    // unless MissedTickBehavior is Delay. 
     int totalMilliseconds = IntervalMilliseconds * 10;
+    // int totalMilliseconds = IntervalMilliseconds * 1000;
     TestContext.Progress.WriteLine(
       $"Testing MeasureTickIntervals for {totalMilliseconds} milliseconds.");
     var ticker = new MillisecondTicker(OnTickMeasureInterval);
     Stopwatch.Restart();
-    ticker.Start(IntervalMilliseconds);
+    ticker.Start(IntervalMilliseconds, MissedTickBehavior);
     Thread.Sleep(totalMilliseconds + 1);
     ticker.Stop();
     TestContext.Progress.WriteLine(IntervalLog.ToString());
@@ -164,7 +178,8 @@ public class TickerTests {
     Stopwatch.Stop();
     IntervalLog.WriteLine(
       $"    Expected {IntervalMilliseconds} milliseconds; " +
-      $"actual {Stopwatch.ElapsedMilliseconds} milliseconds.");
+      $"actual {Stopwatch.ElapsedMilliseconds} milliseconds; " +
+      $"missed tick behavior {MissedTickBehavior}.");
     Stopwatch.Restart();
   }
 }

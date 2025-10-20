@@ -1,6 +1,6 @@
 ﻿use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::time::Duration;
+use tokio::time::{Duration, MissedTickBehavior};
 use tokio::time::interval;
 
 /// ============================================
@@ -17,14 +17,16 @@ use tokio::time::interval;
 /// Perfect for periodic tasks like heartbeats, polling, or game loops!
 pub struct Ticker {
     interval: Duration,
+    missed_tick_behavior: MissedTickBehavior,
     running: Arc<AtomicBool>,
     join_handle: Option<tokio::task::JoinHandle<()>>,
 }
 
 impl Ticker {
-    pub fn new(interval: Duration) -> Self {
+    pub fn new(interval: Duration, missed_tick_behavior: MissedTickBehavior) -> Self {
         Self {
             interval,
+            missed_tick_behavior,
             running: Arc::new(AtomicBool::new(false)),
             join_handle: None,
         }
@@ -37,9 +39,11 @@ impl Ticker {
     {
         let running = self.running.clone();
         let interval_period = self.interval;
+        let missed_tick_behavior = self.missed_tick_behavior;
         running.store(true, Ordering::SeqCst);
         self.join_handle = Some(crate::RUNTIME.spawn(async move {
             let mut ticker = interval(interval_period);
+            ticker.set_missed_tick_behavior(missed_tick_behavior);
             while running.load(Ordering::SeqCst) {
                 ticker.tick().await;
                 let callback_clone = callback.clone();

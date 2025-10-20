@@ -16,7 +16,8 @@ internal class Program {
     // Specify a method that will be called every time the ticker ticks.
     var ticker = new MillisecondTicker(OnTick);
     Console.WriteLine(
-      "Starting MillisecondTicker. There will be 3 ticks, 1 second apart.");
+      "Starting MillisecondTicker. There will be 3 ticks, the first immediately, " +
+      "the others at 1-second intervals.");
     ticker.Start(millisecondsInterval);
     while (true) {
       await Task.Delay(millisecondsCheck);
