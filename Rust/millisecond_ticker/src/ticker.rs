@@ -3,18 +3,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::thread;
 use std::time::{Duration};
 
-/// ============================================
-/// Async Ticker with Start/Stop Control
-/// ============================================
-/// Key Features:
-///
-/// Start/Stop anytime - fully controllable
-/// Thread-safe - uses AtomicBool for the running flag
-/// Non-blocking - runs in background thread.
-/// Reusable - An instance can be started and stopped multiple times.
-///
-/// You can run multiple timers concurrently, and each callback runs on the Tokio runtime.
-/// Perfect for periodic tasks like heartbeats, polling, or game loops!
+/// A ticker that calls a callback on ticking and can be started and stopped.
 pub struct Ticker {
     interval: Duration,
     running: Arc<AtomicBool>,
@@ -28,7 +17,7 @@ impl Ticker {
         }
     }
 
-    /// Start the ticker with a callback
+    /// Starts the ticker with a callback
     pub fn start<F>(&mut self, callback: F)
     where
         F: Fn() + Send + Clone + 'static,
@@ -45,12 +34,7 @@ impl Ticker {
         });
     }
 
-    // /// Check if the ticker is running
-    // pub fn is_running(&self) -> bool {
-    //     self.running.load(Ordering::SeqCst)
-    // }
-
-    /// Stop the ticker
+    /// Stops the ticker
     pub fn stop(&self) {
         self.running.store(false, Ordering::SeqCst);
     }
