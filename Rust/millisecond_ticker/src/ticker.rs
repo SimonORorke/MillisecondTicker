@@ -3,7 +3,8 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::thread;
 use std::time::{Duration};
 
-/// A ticker that calls a callback on ticking and can be started and stopped.
+/// A steady ticker that asynchronously calls a callback on ticking,
+/// and can be started and stopped.
 pub struct Ticker {
     interval: Duration,
     running: Arc<AtomicBool>,

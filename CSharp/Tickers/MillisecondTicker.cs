@@ -8,6 +8,12 @@ namespace Simon.Tickers;
 ///   A .Net wrapper for a precision ticker that ticks at intervals of one or more
 ///   milliseconds. For accuracy, the ticker is implemented in Rust.
 /// </summary>
+/// <remarks>
+///   This is a steady ticker, which means the priority is to tick at equal intervals
+///   rather than for the total duration of a sequence of ticks to equal the expected
+///   elapsed time.  For example, after 60,000 1-millisecond ticks, the elapsed time
+///   might not be exactly one minute.
+/// </remarks>
 public partial class MillisecondTicker {
   private readonly CallbackDelegate _callbackDelegate;
 
