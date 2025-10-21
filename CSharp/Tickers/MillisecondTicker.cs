@@ -30,7 +30,7 @@ public partial class MillisecondTicker {
   }
 
   /// <summary>
-  ///   Dummy. We currently don't really need this.
+  ///   We currently don't really need this.
   ///   But see the comment in <see cref="Stop" />.
   /// </summary>
   [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Local")]
