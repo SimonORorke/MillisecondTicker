@@ -1,7 +1,7 @@
 ﻿use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::thread;
 use std::time::{Duration};
+use std::thread;
 
 /// A steady ticker that asynchronously calls a callback on ticking
 /// and can be started and stopped.
@@ -25,10 +25,16 @@ impl Ticker {
     {
         let running = self.running.clone();
         let interval = self.interval;
+        // let spinner = SpinWait::new();
         running.store(true, Ordering::SeqCst);
         thread::spawn(move || {
             while running.load(Ordering::SeqCst) {
-                thread::sleep(interval);
+                // thread::sleep(interval);
+                // spin_sleep is the steadiest, which is what we want.
+                spin_sleep::sleep(interval);
+                // SpinWait keeps closest to elapsed/system time and uses 100% of one CPU core.
+                // let interval_start = Instant::now();
+                // spinner.spin_until(|| interval_start.elapsed() >= interval);
                 let callback_clone = callback.clone();
                 thread::spawn(move || { callback_clone() });
             }
