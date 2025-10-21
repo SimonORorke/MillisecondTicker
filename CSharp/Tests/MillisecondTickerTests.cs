@@ -6,54 +6,23 @@ namespace Simon.Tickers.Tests;
 
 /// <summary>
 ///   Results are variable. So, rather than asserting, results are just written to the
-///   test output.
-///   The <see cref="SleepWhileTicking" /> and <see cref="CountTicks" /> tests show that
-///   the Rust millisecond ticker is very accurate.
+///   test output.  Summary of test results in Windows.
+///   The <see cref="ZMeasureTickIntervals" /> test shows that the Rust millisecond
+///   ticker is very steady, though the first one or two ticks can be shaky.
+///   Elapsed times after many ticks are less than expected for short tick intervals
+///   but about right for tick intervals of around 100 milliseconds or more.
 ///   The <see cref="Delay" /> and <see cref="Sleep" /> tests show that
 ///   a millisecond ticker made with C# code would be unreliable and often hopelessly
-///   slow. It may not be obvious for Delay here, but the same test in an application
-///   rather than NUnit is very slow.
+///   slow.
 /// </summary>
 [TestFixture]
 public class TickerTests {
-  // For more accurate timing, allowing for fixed overheads,
-  // run the MillisecondTicker tests for longer.
-  private const int RustTestMilliseconds = 1000 * 60; // 1 minute 
-  // private const int RustTestMilliseconds = 10;
-
   private long _tickCount; // Thread safe counter.
 
-  private StringWriter IntervalLog { get; set; } = null!;
+  private StringWriter IntervalLog { get; set; } = new StringWriter();
   private int IntervalMilliseconds { get; set; }
   private Stopwatch Stopwatch { get; } = new Stopwatch();
   private MillisecondTicker Ticker { get; set; } = null!;
-
-
-  /// <summary>
-  ///   Tests the accuracy of <see cref="MillisecondTicker" /> by counting its ticks.
-  /// </summary>
-  [Test]
-  public async Task CountTicks() {
-    await TestContext.Progress.WriteLineAsync(
-      $"Test TickerTests.CountTicks: Running test for {RustTestMilliseconds} ticks.");
-    Interlocked.Exchange(ref _tickCount, 0);
-    var ticker = new MillisecondTicker(OnTickIncrementTickCount);
-    Stopwatch.Restart();
-    ticker.Start(1);
-    while (true) {
-      await Task.Delay(1);
-      long tickCount = Interlocked.Read(ref _tickCount);
-      if (tickCount >= RustTestMilliseconds) {
-        break;
-      }
-    }
-    // For the most accurate timing, stop the Stopwatch before calling Stop() on the
-    // ticker.
-    Stopwatch.Stop();
-    ticker.Stop();
-    await TestContext.Progress.WriteLineAsync(
-      $"    Elapsed milliseconds on Stop = {Stopwatch.ElapsedMilliseconds}.");
-  }
 
   /// <summary>
   ///   Tests the accuracy of <see cref="Task.Delay(int)" />, for comparison with
@@ -77,48 +46,8 @@ public class TickerTests {
 
   [Test]
   public void InvalidInterval() {
-    var ticker = new MillisecondTicker(OnTickIncrementTickCount);
-    Assert.Throws<ArgumentException>(() => ticker.Start(0));
-  }
-
-  /// <summary>
-  ///   Measures the intervals between ticks of the <see cref="MillisecondTicker" />,
-  ///   to get an idea of how steady they are.
-  /// </summary>
-  /// <remarks>
-  ///   No data is written to the log
-  ///   if followed by other tests.  So this must be run individually, hence the
-  ///   [Explicit] attribute.
-  /// </remarks>
-  [Test, Explicit, ExcludeFromCodeCoverage]
-  public void MeasureTickIntervals() {
-    Ticker = new MillisecondTicker(OnTickMeasureInterval);
-    MeasureTickIntervals(1, 100);
-    MeasureTickIntervals(10, 100);
-    // MeasureTickIntervals(100, 20);
-    // MeasureTickIntervals(1000, 20);
-  }
-
-  [ExcludeFromCodeCoverage]
-  private void MeasureTickIntervals(
-    int intervalMilliseconds, int waitFactor) {
-    IntervalMilliseconds = intervalMilliseconds;
-    // The first tick will happen "immediately", so its interval will be short.
-    // However, if we will sleep for 10 intervals plus a millisecond, we will actually
-    // get (at least) 11 measurements, so 10 that are relevant,
-    // unless MissedTickBehavior is Delay. 
-    int waitMilliseconds = IntervalMilliseconds * waitFactor + 1;
-    TestContext.Progress.WriteLine(
-      $"MeasureTickIntervals: testing {IntervalMilliseconds} millisecond interval " +
-      $"for {waitMilliseconds} milliseconds.");
-    IntervalLog = new StringWriter();
-    // Ticker = new MillisecondTicker(OnTickMeasureInterval);
-    Stopwatch.Restart();
-    Ticker.Start(IntervalMilliseconds);
-    Thread.Sleep(waitMilliseconds);
-    Ticker.Stop();
-    Stopwatch.Stop();
-    TestContext.Progress.WriteLine(IntervalLog.ToString());
+    Ticker = new MillisecondTicker(OnTick);
+    Assert.Throws<ArgumentException>(() => Ticker.Start(0));
   }
 
   /// <summary>
@@ -142,44 +71,63 @@ public class TickerTests {
   }
 
   /// <summary>
-  ///   Tests the accuracy of <see cref="MillisecondTicker" /> by sleeping while it ticks.
+  ///   Measures the intervals between ticks of the <see cref="MillisecondTicker" />,
+  ///   to get an idea of how steady they are.
   /// </summary>
+  /// <remarks>
+  ///   Data is written to the log in a separate callback thread.
+  ///   So this test must be run last in order to copy the data to the test output.
+  /// </remarks>
   [Test]
-  public void SleepWhileTicking() {
+  public void ZMeasureTickIntervals() {
+    Ticker = new MillisecondTicker(OnTick);
+    ZMeasureTickIntervals(1, 100);
+    ZMeasureTickIntervals(10, 50);
+    ZMeasureTickIntervals(100, 30);
+    ZMeasureTickIntervals(1000, 30);
+  }
+
+  [ExcludeFromCodeCoverage]
+  private void ZMeasureTickIntervals(
+    int intervalMilliseconds, int waitFactor) {
+    IntervalMilliseconds = intervalMilliseconds;
+    int sleepMilliseconds = IntervalMilliseconds * waitFactor + 1;
     TestContext.Progress.WriteLine(
-      $"Test TickerTests.SleepWhileTicking: Running test for {RustTestMilliseconds} milliseconds.");
+      $"MeasureTickIntervals: testing {IntervalMilliseconds}-millisecond tick " +
+      $"interval. Sleeping for {sleepMilliseconds} milliseconds.");
     Interlocked.Exchange(ref _tickCount, 0);
-    var ticker = new MillisecondTicker(OnTickIncrementTickCount);
-    // Start a Stopwatch, as that will be more accurate than Thread.Sleep().
+    IntervalLog = new StringWriter();
+    var totalStopwatch = new Stopwatch();
+    totalStopwatch.Start();
     Stopwatch.Restart();
-    ticker.Start(1);
-    Thread.Sleep(RustTestMilliseconds);
-    // For the most accurate timing, stop the Stopwatch before calling Stop() on the
-    // ticker.
+    Ticker.Start(IntervalMilliseconds);
+    Thread.Sleep(sleepMilliseconds);
+    Ticker.Stop();
     Stopwatch.Stop();
-    ticker.Stop();
-    long tickCount1 = Interlocked.Read(ref _tickCount);
-    // Check that Stop works.
-    const int millisecondsWaitAfterStop = 5;
-    Thread.Sleep(millisecondsWaitAfterStop);
-    long tickCount2 = Interlocked.Read(ref _tickCount);
+    totalStopwatch.Stop();
+    long totalTickCount = Interlocked.Read(ref _tickCount);
+    long expectedMilliseconds = totalTickCount * IntervalMilliseconds;
+    TestContext.Progress.Write(IntervalLog.ToString());
+    TestContext.Progress.WriteLine("************************************************");
+    TestContext.Progress.WriteLine($"Total tick count: {totalTickCount}.");
     TestContext.Progress.WriteLine(
-      $"    Tick count on Stop = {tickCount1}. " +
-      $"Stopwatch: {Stopwatch.ElapsedMilliseconds} milliseconds.");
-    // There is usually 1 more tick after calling Stop() on the ticker.
-    TestContext.Progress.WriteLine(
-      $"    Tick count after {millisecondsWaitAfterStop} milliseconds = {tickCount2}.");
+      $"Elapsed milliseconds: expected total tick count {totalTickCount} " +
+      $"* interval {IntervalMilliseconds} = {expectedMilliseconds}; " +
+      $"measured {totalStopwatch.ElapsedMilliseconds}.");
+    TestContext.Progress.WriteLine("************************************************");
   }
 
-  private void OnTickIncrementTickCount() {
+  /// <summary>
+  ///   Tick callback running in a separate thread.
+  /// </summary>
+  private void OnTick() {
+    Stopwatch.Stop();
     Interlocked.Increment(ref _tickCount);
-  }
-
-  private void OnTickMeasureInterval() {
-    Stopwatch.Stop();
+    // Because we are in a separate thread, we can't write directly to the test output
+    // here. 
     IntervalLog.WriteLine(
-      $"Expected {IntervalMilliseconds} milliseconds; " +
-      $"actual {Stopwatch.ElapsedMilliseconds} milliseconds.");
+      $"Tick interval milliseconds: expected {IntervalMilliseconds}; " +
+      $"actual {Stopwatch.ElapsedMilliseconds}.");
     Stopwatch.Restart();
   }
 }
