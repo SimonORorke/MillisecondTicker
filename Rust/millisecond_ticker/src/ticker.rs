@@ -1,7 +1,9 @@
-﻿use std::sync::Arc;
-use std::sync::atomic::{AtomicBool, Ordering};
-use std::time::{Duration};
+﻿use howlong::{Clock, SteadyClock};
 use lazy_static::lazy_static;
+use spinwait::SpinWait;
+use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::time::Duration;
 use tokio::runtime::{self, Runtime};
 
 lazy_static! {
@@ -33,16 +35,18 @@ impl Ticker {
     {
         let running = self.running.clone();
         let interval = self.interval;
-        // let spinner = SpinWait::new();
+        let spinner = SpinWait::new();
         running.store(true, Ordering::SeqCst);
+        // I'd rather use std::thread::spawn here. However, if I run the Avalonia C# application
+        // in an IDE (JetBrains Rider or Visual Studio), Rust panics when attempting to spawn,
+        // with this error message:
+        //     failed to spawn thread: Os { code: 5, kind: PermissionDenied, message: "Access is denied." }
+        // I can see the error message in Rider but have not been able to find where to see it
+        // in Visual Studio.
         RUNTIME.spawn(async move {
             while running.load(Ordering::SeqCst) {
-                // thread::sleep(interval);
-                // spin_sleep is the steadiest, which is what we want.
-                spin_sleep::sleep(interval);
-                // SpinWait keeps closest to elapsed/system time and uses 100% of one CPU core.
-                // let interval_start = Instant::now();
-                // spinner.spin_until(|| interval_start.elapsed() >= interval);
+                let interval_start = SteadyClock::now();
+                spinner.spin_until(|| (SteadyClock::now() - interval_start) >= interval);
                 let callback_clone = callback.clone();
                 RUNTIME.spawn(async move { callback_clone() });
             }
