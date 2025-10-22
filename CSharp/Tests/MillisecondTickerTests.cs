@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using NUnit.Framework;
 
 namespace Simon.Tickers.Tests;
@@ -87,7 +86,6 @@ public class TickerTests {
     // ZMeasureTickIntervals(1000, 30);
   }
 
-  [ExcludeFromCodeCoverage]
   private void ZMeasureTickIntervals(
     int intervalMilliseconds, int waitFactor) {
     IntervalMilliseconds = intervalMilliseconds;
