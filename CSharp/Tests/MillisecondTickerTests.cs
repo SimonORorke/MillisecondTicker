@@ -80,11 +80,12 @@ public class TickerTests {
   [Test]
   public void ZMeasureTickIntervals() {
     Ticker = new MillisecondTicker(OnTick);
-    ZMeasureTickIntervals(1, 180);
+    // ZMeasureTickIntervals(1, 180);
+    ZMeasureTickIntervals(100, 180);
+    // ZMeasureTickIntervals(1000, 180);
     // ZMeasureTickIntervals(10, 50);
     // ZMeasureTickIntervals(100, 30);
     // ZMeasureTickIntervals(1000, 30);
-    // ZMeasureTickIntervals(1000, 180);
   }
 
   private void ZMeasureTickIntervals(

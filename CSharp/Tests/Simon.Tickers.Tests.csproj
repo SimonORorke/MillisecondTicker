@@ -8,9 +8,10 @@
         <IsPackable>false</IsPackable>
     </PropertyGroup>
     <ItemGroup>
-        <!-- Copy the Rust library, if changed, to the current output folder. -->
+        <!-- Copy the Rust library to the current output folder. -->
         <Content Include="..\..\Rust\millisecond_ticker\target\release\millisecond_ticker.dll">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+<!--            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>-->
         </Content>
     </ItemGroup>
     <ItemGroup>

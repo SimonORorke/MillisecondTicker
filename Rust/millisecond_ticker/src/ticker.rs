@@ -1,17 +1,8 @@
 ﻿use howlong::{Clock, SteadyClock};
-use lazy_static::lazy_static;
 use spinwait::SpinWait;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Duration;
-use tokio::runtime::{self, Runtime};
-
-lazy_static! {
-    /// Tokio runtime suitable for use in a Foreign Function Interface (FFI) library.
-    static ref RUNTIME: Runtime = runtime::Builder::new_multi_thread()
-        .build()
-        .unwrap();
-}
 
 /// A steady ticker that asynchronously calls a callback on ticking
 /// and can be started and stopped.
@@ -41,14 +32,14 @@ impl Ticker {
         // in an IDE (JetBrains Rider or Visual Studio), Rust panics when attempting to spawn,
         // with this error message:
         //     failed to spawn thread: Os { code: 5, kind: PermissionDenied, message: "Access is denied." }
-        // I can see the error message in Rider but have not been able to find where to see it
-        // in Visual Studio.
-        RUNTIME.spawn(async move {
+        // Rayon::spawn does not have this problem, as it uses a thread pool that Rayon has created
+        // in advance.
+        rayon::spawn(move || {
             while running.load(Ordering::SeqCst) {
                 let interval_start = SteadyClock::now();
                 spinner.spin_until(|| (SteadyClock::now() - interval_start) >= interval);
                 let callback_clone = callback.clone();
-                RUNTIME.spawn(async move { callback_clone() });
+                rayon::spawn(move || { callback_clone() });
             }
         });
     }
