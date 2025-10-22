@@ -37,7 +37,7 @@ impl Ticker {
         let interval = self.interval;
         let spinner = SpinWait::new();
         running.store(true, Ordering::SeqCst);
-        // I'd rather use std::thread::spawn here. However, if I run the Avalonia C# application
+        // We cannot use std::thread::spawn here. If the Avalonia C# application is run
         // in an IDE (JetBrains Rider or Visual Studio), Rust panics when attempting to spawn,
         // with this error message:
         //     failed to spawn thread: Os { code: 5, kind: PermissionDenied, message: "Access is denied." }
