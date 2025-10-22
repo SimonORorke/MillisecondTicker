@@ -4,7 +4,6 @@ use std::sync::Mutex;
 use std::time::Duration;
 use lazy_static::lazy_static;
 use ticker::Ticker;
-use tokio::runtime::{self, Runtime};
 
 /// Callback function type that C# will implement
 type TickCallback = extern "C" fn();
@@ -39,13 +38,6 @@ lazy_static! {
     static ref DATA: Mutex<Data> = Mutex::new(Data {
         ticker: None,
     });
-
-    /// Tokio runtime suitable for use in a Foreign Function Interface (FFI) library.
-    static ref RUNTIME: Runtime = runtime::Builder::new_multi_thread()
-        .enable_io() // ???
-        .enable_time() // Required for Ticker.
-        .build()
-        .unwrap();
 }
 
 /// Expose this function to C#
