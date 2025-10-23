@@ -1,3 +1,9 @@
+ZMeasureTickIntervals Test
+
+Rust Timer: spin_sleep::sleep
+Operating System: Windows
+Processor: AMD Ryzen 9 5900X 12-Core
+
 ZMeasureTickIntervals: testing 1-millisecond tick interval. Sleeping for 30 milliseconds.
 Tick interval milliseconds: expected 1; actual 3.
 Tick interval milliseconds: expected 1; actual 1.

@@ -57,15 +57,15 @@ public class TickerTests {
     TestContext.Progress.WriteLine($"Stopped at {DateTime.Now:HH:mm:ss}");
     long totalTickCount = Interlocked.Read(ref _tickCount);
     float averageIntervalMilliseconds = (float)Math.Round(
-      (float)totalTickCount / totalStopwatch.ElapsedMilliseconds, 5);
-    TestContext.Progress.WriteLine($"Total tick count: {totalTickCount}");
+      (float)totalStopwatch.ElapsedMilliseconds / totalTickCount, 5);
     TestContext.Progress.WriteLine(
       $"Actual elapsed milliseconds: {totalStopwatch.ElapsedMilliseconds}");
+    TestContext.Progress.WriteLine($"Total tick count: {totalTickCount}");
     TestContext.Progress.WriteLine("Average tick interval");
     TestContext.Progress.WriteLine(
       $"    Expected: {IntervalMilliseconds} millisecond");
     TestContext.Progress.WriteLine(
-      $"    Actual: {totalTickCount} / {totalStopwatch.ElapsedMilliseconds} = " +
+      $"    Actual: {totalStopwatch.ElapsedMilliseconds} / {totalTickCount} = " +
       $"{averageIntervalMilliseconds} milliseconds");
   }
 

@@ -1,10 +1,13 @@
 AverageTickInterval Test
+
+Rust Timer: spin_sleep::sleep
+Operating System: Windows
+Processor: AMD Ryzen 9 5900X 12-Core
+
 Specified tick interval: 1 millisecond
 Sleeping for 600000 milliseconds = 10 minutes.
-Started at 21:31:07
-Stopped at 21:41:07
-Total tick count: 598630
-Actual elapsed milliseconds: 600015
+Actual elapsed milliseconds: 600016
+Total tick count: 598843
 Average tick interval
     Expected: 1 millisecond
-    Actual: 598630 / 600015 = 0.99769 milliseconds
+    Actual: 600016 / 598843 = 1.00196 milliseconds
