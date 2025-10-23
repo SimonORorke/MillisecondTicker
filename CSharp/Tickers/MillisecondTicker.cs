@@ -14,7 +14,7 @@ namespace Simon.Tickers;
 ///   elapsed time. For example, after 60,000 1-millisecond ticks, the elapsed time
 ///   might not be exactly one minute.
 ///   <para>
-///     In Windows, the durations of the first two ticks are usually inaccurate.
+///     In Windows, the durations of the first one or two ticks are usually inaccurate.
 ///   </para>
 ///   <para>
 ///     The Rust library must be copied to the executable's output directory.
