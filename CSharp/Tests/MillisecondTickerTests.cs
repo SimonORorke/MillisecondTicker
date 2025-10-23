@@ -9,6 +9,9 @@ namespace Simon.Tickers.Tests;
 ///   The <see cref="ZMeasureTickIntervals" /> test shows that the Rust millisecond
 ///   ticker is very steady, though the first one or two ticks can be shaky.  Also,
 ///   see the remarks for <see cref="ZMeasureTickIntervals" /> method.
+///   The <see cref="CountTicks" /> test shows that, as the ticker ticks steadily rather
+///   than trying to match elapsed time, the ticker is just over a second fast after
+///   10 minutes (on my computer with a AMD Ryzen 9 5900X 12-Core Processor).
 ///   The <see cref="Delay" /> and <see cref="Sleep" /> tests show that
 ///   a millisecond ticker made with C# code would be unreliable and often hopelessly
 ///   slow.
@@ -27,21 +30,30 @@ public class TickerTests {
   ///   This test will give the most accurate
   ///   measurement of the total elapsed time after the ticker has stopped. It also
   ///   provides an opportunity to monitor the ticker's impact on CPU usage.
+  /// 
   ///   CPU usage.
-  ///   Spin: 4-19%, typical 4-9%.
+  ///   SPIN-SLEEP: 2-20%, typical 2-3%.
+  ///   SPIN: 4-19%, typical 4-9%.
+  /// 
   ///   Total elapsed after 10 minutes sleep.
-  ///   Spin:
-  ///   Elapsed milliseconds
-  ///     Expected: total tick count 598875 * interval 1 = 598875
-  ///     Measured: 600012.
-  ///   So the 598875 ticks were a total of 1.137 seconds fast after 10 minutes. 
+  ///   SPIN-SLEEP:
+  ///       Total tick count: 598589.
+  ///       Elapsed milliseconds
+  ///           Expected: total tick count 598589 * interval 1 = 598589
+  ///           Measured: 600013.
+  ///       So the 598589 ticks were a total of 1.424 seconds fast after 10 minutes sleep.
+  ///   SPIN:
+  ///       Elapsed milliseconds
+  ///           Expected: total tick count 598875 * interval 1 = 598875
+  ///           Measured: 600012.
+  ///       So the 598875 ticks were a total of 1.137 seconds fast after 10 minutes sleep. 
   /// </summary>
   [Test]
   public void CountTicks() {
     const int sleepMilliseconds = 1000 * 600 + 1; // 10 minutes and 1 millisecond.
     IntervalMilliseconds = 1;
     TestContext.Progress.WriteLine(
-      $"SleepWhileTicking: testing {IntervalMilliseconds}-millisecond tick " +
+      $"CountTicks: testing {IntervalMilliseconds}-millisecond tick " +
       $"interval. Sleeping for {sleepMilliseconds} milliseconds.");
     Interlocked.Exchange(ref _tickCount, 0);
     var totalStopwatch = new Stopwatch();
@@ -141,10 +153,10 @@ public class TickerTests {
     // ZMeasureTickIntervals(1000, 180);
 
     // The combined results from all of these tests fit within the test output size limit.
-    ZMeasureTickIntervals(1, 40);
-    ZMeasureTickIntervals(10, 40);
-    ZMeasureTickIntervals(100, 40);
-    ZMeasureTickIntervals(1000, 40);
+    ZMeasureTickIntervals(1, 30);
+    ZMeasureTickIntervals(10, 30);
+    ZMeasureTickIntervals(100, 30);
+    ZMeasureTickIntervals(1000, 30);
   }
 
   private void ZMeasureTickIntervals(

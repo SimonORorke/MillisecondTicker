@@ -1,5 +1,5 @@
-﻿use howlong::{Clock, SteadyClock};
-use spinwait::SpinWait;
+﻿// use howlong::{Clock, SteadyClock};
+// use spinwait::SpinWait;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Duration;
@@ -26,7 +26,7 @@ impl Ticker {
     {
         let running = self.running.clone();
         let interval = self.interval;
-        let spinner = SpinWait::new();
+        // let spinner = SpinWait::new();
         running.store(true, Ordering::SeqCst);
         // We cannot use std::thread::spawn here. If the Avalonia C# application is run
         // in an IDE (JetBrains Rider or Visual Studio), Rust panics when attempting to spawn,
@@ -36,8 +36,9 @@ impl Ticker {
         // in advance.
         rayon::spawn(move || {
             while running.load(Ordering::SeqCst) {
-                let interval_start = SteadyClock::now();
-                spinner.spin_until(|| (SteadyClock::now() - interval_start) >= interval);
+                spin_sleep::sleep(interval);
+                // let interval_start = SteadyClock::now();
+                // spinner.spin_until(|| (SteadyClock::now() - interval_start) >= interval);
                 let callback_clone = callback.clone();
                 rayon::spawn(move || { callback_clone() });
             }
