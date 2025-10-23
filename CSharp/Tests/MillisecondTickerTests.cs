@@ -9,9 +9,9 @@ namespace Simon.Tickers.Tests;
 ///   The <see cref="ZMeasureTickIntervals" /> test shows that the Rust millisecond
 ///   ticker is very steady, though the first one or two ticks can be shaky.  Also,
 ///   see the remarks for <see cref="ZMeasureTickIntervals" /> method.
-///   The <see cref="AverageTickInterval" /> test shows that, as the ticker ticks steadily rather
-///   than trying to match elapsed time, the ticker is just over a second fast after
-///   10 minutes (on my computer with a AMD Ryzen 9 5900X 12-Core Processor).
+///   The <see cref="AverageTickInterval" /> test shows that, as the ticker ticks
+///   steadily rather than trying to match elapsed time, the average actual interval
+///   is very slightly longer than the specified interval.
 ///   The <see cref="Delay" /> and <see cref="Sleep" /> tests show that
 ///   a millisecond ticker made with C# code would be unreliable and often hopelessly
 ///   slow.
@@ -29,10 +29,6 @@ public class TickerTests {
   ///   Measures the average actual tick interval over 10 minutes for a specified tick
   ///   interval of 1 millisecond. This test also provides an opportunity to monitor the
   ///   ticker's impact on CPU usage.
-  ///   CPU usage.
-  ///       SLEEP: 0-15%, typical 0-3%.
-  ///       SPIN-SLEEP: 2-20%, typical 2-3%.
-  ///       SPIN-WAIT: 4-19%, typical 4-9%.
   /// </summary>
   [Test]
   public void AverageTickInterval() {
