@@ -1,0 +1,10 @@
+AverageTickInterval Test
+Specified tick interval: 1 millisecond
+Sleeping for 600000 milliseconds = 10 minutes.
+Started at 18:58:51
+Stopped at 19:08:51
+Total tick count: 393297
+Actual elapsed milliseconds: 600014
+Average tick interval
+    Expected: 1 millisecond
+    Actual: 393297 / 600014 = 0.65548 milliseconds

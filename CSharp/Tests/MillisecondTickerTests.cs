@@ -9,7 +9,7 @@ namespace Simon.Tickers.Tests;
 ///   The <see cref="ZMeasureTickIntervals" /> test shows that the Rust millisecond
 ///   ticker is very steady, though the first one or two ticks can be shaky.  Also,
 ///   see the remarks for <see cref="ZMeasureTickIntervals" /> method.
-///   The <see cref="CountTicks" /> test shows that, as the ticker ticks steadily rather
+///   The <see cref="AverageTickInterval" /> test shows that, as the ticker ticks steadily rather
 ///   than trying to match elapsed time, the ticker is just over a second fast after
 ///   10 minutes (on my computer with a AMD Ryzen 9 5900X 12-Core Processor).
 ///   The <see cref="Delay" /> and <see cref="Sleep" /> tests show that
@@ -26,25 +26,27 @@ public class TickerTests {
   private MillisecondTicker Ticker { get; set; } = null!;
 
   /// <summary>
-  ///   Sleep while the ticker callback is counting ticks.
-  ///   This test will give the most accurate
-  ///   measurement of the total elapsed time after the ticker has stopped. It also
-  ///   provides an opportunity to monitor the ticker's impact on CPU usage.
-  /// 
+  ///   Measures the average actual tick interval over 10 minutes for a specified tick
+  ///   interval of 1 millisecond. This test also provides an opportunity to monitor the
+  ///   ticker's impact on CPU usage.
   ///   CPU usage.
   ///       SLEEP: 0-15%, typical 0-3%.
   ///       SPIN-SLEEP: 2-20%, typical 2-3%.
   ///       SPIN-WAIT: 4-19%, typical 4-9%.
   /// </summary>
   [Test]
-  public void CountTicks() {
+  public void AverageTickInterval() {
     const int sleepMilliseconds = 1000 * 600; // 10 minutes.
     IntervalMilliseconds = 1;
+    TestContext.Progress.WriteLine("AverageTickInterval Test");
     TestContext.Progress.WriteLine(
-      $"CountTicks: testing {IntervalMilliseconds}-millisecond tick " +
-      $"interval. Sleeping for {sleepMilliseconds} milliseconds.");
+      $"Specified tick interval: {IntervalMilliseconds} millisecond");
+    TestContext.Progress.WriteLine(
+      $"Sleeping for {sleepMilliseconds} milliseconds = " +
+      $"{sleepMilliseconds / 60000} minutes.");
     Interlocked.Exchange(ref _tickCount, 0);
     var totalStopwatch = new Stopwatch();
+    TestContext.Progress.WriteLine($"Started at {DateTime.Now:HH:mm:ss}");
     totalStopwatch.Start();
     Ticker = new MillisecondTicker(OnTickIncrementTickCount);
     Ticker.Start(IntervalMilliseconds);
@@ -52,19 +54,19 @@ public class TickerTests {
     // For greatest accuracy, stop the stopwatch before calling Stop() on the ticker.
     totalStopwatch.Stop();
     Ticker.Stop();
+    TestContext.Progress.WriteLine($"Stopped at {DateTime.Now:HH:mm:ss}");
     long totalTickCount = Interlocked.Read(ref _tickCount);
-    long expectedMilliseconds = totalTickCount * IntervalMilliseconds;
-    decimal fastSeconds = 
-      (decimal)(totalStopwatch.ElapsedMilliseconds - totalTickCount) / 1000;
-    TestContext.Progress.WriteLine($"Total tick count: {totalTickCount}.");
-    TestContext.Progress.WriteLine("Elapsed milliseconds");
+    float averageIntervalMilliseconds = (float)Math.Round(
+      (float)totalTickCount / totalStopwatch.ElapsedMilliseconds, 5);
+    TestContext.Progress.WriteLine($"Total tick count: {totalTickCount}");
     TestContext.Progress.WriteLine(
-      $"    Expected: total tick count {totalTickCount} " +
-      $"* interval {IntervalMilliseconds} = {expectedMilliseconds}");
-    TestContext.Progress.WriteLine($"    Measured: {totalStopwatch.ElapsedMilliseconds}.");
+      $"Actual elapsed milliseconds: {totalStopwatch.ElapsedMilliseconds}");
+    TestContext.Progress.WriteLine("Average tick interval");
     TestContext.Progress.WriteLine(
-      $"So the {totalTickCount} ticks were a total of {fastSeconds} seconds fast " +
-      $"after 10 minutes sleep.");
+      $"    Expected: {IntervalMilliseconds} millisecond");
+    TestContext.Progress.WriteLine(
+      $"    Actual: {totalTickCount} / {totalStopwatch.ElapsedMilliseconds} = " +
+      $"{averageIntervalMilliseconds} milliseconds");
   }
 
   /// <summary>
@@ -135,16 +137,16 @@ public class TickerTests {
   public void ZMeasureTickIntervals() {
     Ticker = new MillisecondTicker(OnTickMeasureTickInterval);
     // The results from any one of these tests fit within the test output size limit
-    // ZMeasureTickIntervals(1, 180);
+    ZMeasureTickIntervals(1, 180);
     // ZMeasureTickIntervals(10, 180);
     // ZMeasureTickIntervals(100, 180);
     // ZMeasureTickIntervals(1000, 180);
 
     // The combined results from all of these tests fit within the test output size limit.
-    ZMeasureTickIntervals(1, 30);
-    ZMeasureTickIntervals(10, 30);
-    ZMeasureTickIntervals(100, 30);
-    ZMeasureTickIntervals(1000, 30);
+    // ZMeasureTickIntervals(1, 30);
+    // ZMeasureTickIntervals(10, 30);
+    // ZMeasureTickIntervals(100, 30);
+    // ZMeasureTickIntervals(1000, 30);
   }
 
   private void ZMeasureTickIntervals(
