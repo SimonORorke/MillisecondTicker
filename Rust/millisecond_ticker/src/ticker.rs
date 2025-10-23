@@ -36,7 +36,8 @@ impl Ticker {
         // in advance.
         rayon::spawn(move || {
             while running.load(Ordering::SeqCst) {
-                spin_sleep::sleep(interval);
+                std::thread::sleep(interval);
+                // spin_sleep::sleep(interval);
                 // let interval_start = SteadyClock::now();
                 // spinner.spin_until(|| (SteadyClock::now() - interval_start) >= interval);
                 let callback_clone = callback.clone();

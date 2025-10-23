@@ -32,25 +32,13 @@ public class TickerTests {
   ///   provides an opportunity to monitor the ticker's impact on CPU usage.
   /// 
   ///   CPU usage.
-  ///   SPIN-SLEEP: 2-20%, typical 2-3%.
-  ///   SPIN: 4-19%, typical 4-9%.
-  /// 
-  ///   Total elapsed after 10 minutes sleep.
-  ///   SPIN-SLEEP:
-  ///       Total tick count: 598589.
-  ///       Elapsed milliseconds
-  ///           Expected: total tick count 598589 * interval 1 = 598589
-  ///           Measured: 600013.
-  ///       So the 598589 ticks were a total of 1.424 seconds fast after 10 minutes sleep.
-  ///   SPIN:
-  ///       Elapsed milliseconds
-  ///           Expected: total tick count 598875 * interval 1 = 598875
-  ///           Measured: 600012.
-  ///       So the 598875 ticks were a total of 1.137 seconds fast after 10 minutes sleep. 
+  ///       SLEEP: 0-15%, typical 0-3%.
+  ///       SPIN-SLEEP: 2-20%, typical 2-3%.
+  ///       SPIN-WAIT: 4-19%, typical 4-9%.
   /// </summary>
   [Test]
   public void CountTicks() {
-    const int sleepMilliseconds = 1000 * 600 + 1; // 10 minutes and 1 millisecond.
+    const int sleepMilliseconds = 1000 * 600; // 10 minutes.
     IntervalMilliseconds = 1;
     TestContext.Progress.WriteLine(
       $"CountTicks: testing {IntervalMilliseconds}-millisecond tick " +
@@ -162,7 +150,7 @@ public class TickerTests {
   private void ZMeasureTickIntervals(
     int intervalMilliseconds, int waitFactor) {
     IntervalMilliseconds = intervalMilliseconds;
-    int sleepMilliseconds = IntervalMilliseconds * waitFactor + 1;
+    int sleepMilliseconds = IntervalMilliseconds * waitFactor;
     TestContext.Progress.WriteLine(
       $"ZMeasureTickIntervals: testing {IntervalMilliseconds}-millisecond tick " +
       $"interval. Sleeping for {sleepMilliseconds} milliseconds.");
@@ -183,11 +171,11 @@ public class TickerTests {
     TestContext.Progress.WriteLine("************************************************");
     TestContext.Progress.WriteLine($"Slept for {sleepMilliseconds} milliseconds.");
     TestContext.Progress.WriteLine($"Total tick count: {totalTickCount}.");
-    TestContext.Progress.WriteLine("Elapsed milliseconds:");
+    TestContext.Progress.WriteLine("Elapsed milliseconds");
     TestContext.Progress.WriteLine(
-      $"    Expected total tick count {totalTickCount} " +
+      $"    Expected: total tick count {totalTickCount} " +
       $"* interval {IntervalMilliseconds} = {expectedMilliseconds}");
-    TestContext.Progress.WriteLine($"    Measured {totalStopwatch.ElapsedMilliseconds}.");
+    TestContext.Progress.WriteLine($"    Measured: {totalStopwatch.ElapsedMilliseconds}.");
     TestContext.Progress.WriteLine("************************************************");
   }
 

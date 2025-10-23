@@ -1,0 +1,8 @@
+SLEEP
+
+CountTicks: testing 1-millisecond tick interval. Sleeping for 600000 milliseconds.
+Total tick count: 393953.
+Elapsed milliseconds
+    Expected: total tick count 393953 * interval 1 = 393953
+    Measured: 600003.
+So the 393953 ticks were a total of 206.05 seconds fast after 10 minutes sleep.

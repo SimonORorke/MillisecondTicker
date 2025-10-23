@@ -1,0 +1,145 @@
+ZMeasureTickIntervals: testing 1-millisecond tick interval. Sleeping for 30 milliseconds.
+Tick interval milliseconds: expected 1; actual 3.
+Tick interval milliseconds: expected 1; actual 1.
+Tick interval milliseconds: expected 1; actual 1.
+Tick interval milliseconds: expected 1; actual 1.
+Tick interval milliseconds: expected 1; actual 1.
+Tick interval milliseconds: expected 1; actual 1.
+Tick interval milliseconds: expected 1; actual 1.
+Tick interval milliseconds: expected 1; actual 1.
+Tick interval milliseconds: expected 1; actual 1.
+Tick interval milliseconds: expected 1; actual 1.
+Tick interval milliseconds: expected 1; actual 1.
+Tick interval milliseconds: expected 1; actual 1.
+Tick interval milliseconds: expected 1; actual 1.
+Tick interval milliseconds: expected 1; actual 1.
+Tick interval milliseconds: expected 1; actual 1.
+Tick interval milliseconds: expected 1; actual 1.
+Tick interval milliseconds: expected 1; actual 1.
+Tick interval milliseconds: expected 1; actual 1.
+Tick interval milliseconds: expected 1; actual 1.
+Tick interval milliseconds: expected 1; actual 1.
+Tick interval milliseconds: expected 1; actual 1.
+************************************************
+Slept for 30 milliseconds.
+Total tick count: 21.
+Elapsed milliseconds
+    Expected: total tick count 21 * interval 1 = 21
+    Measured: 33.
+************************************************
+ZMeasureTickIntervals: testing 10-millisecond tick interval. Sleeping for 300 milliseconds.
+Tick interval milliseconds: expected 10; actual 0.
+Tick interval milliseconds: expected 10; actual 10.
+Tick interval milliseconds: expected 10; actual 10.
+Tick interval milliseconds: expected 10; actual 10.
+Tick interval milliseconds: expected 10; actual 10.
+Tick interval milliseconds: expected 10; actual 10.
+Tick interval milliseconds: expected 10; actual 10.
+Tick interval milliseconds: expected 10; actual 10.
+Tick interval milliseconds: expected 10; actual 10.
+Tick interval milliseconds: expected 10; actual 10.
+Tick interval milliseconds: expected 10; actual 10.
+Tick interval milliseconds: expected 10; actual 10.
+Tick interval milliseconds: expected 10; actual 10.
+Tick interval milliseconds: expected 10; actual 10.
+Tick interval milliseconds: expected 10; actual 10.
+Tick interval milliseconds: expected 10; actual 10.
+Tick interval milliseconds: expected 10; actual 10.
+Tick interval milliseconds: expected 10; actual 10.
+Tick interval milliseconds: expected 10; actual 10.
+Tick interval milliseconds: expected 10; actual 10.
+Tick interval milliseconds: expected 10; actual 10.
+Tick interval milliseconds: expected 10; actual 10.
+Tick interval milliseconds: expected 10; actual 10.
+Tick interval milliseconds: expected 10; actual 10.
+Tick interval milliseconds: expected 10; actual 10.
+Tick interval milliseconds: expected 10; actual 10.
+Tick interval milliseconds: expected 10; actual 10.
+Tick interval milliseconds: expected 10; actual 10.
+Tick interval milliseconds: expected 10; actual 10.
+Tick interval milliseconds: expected 10; actual 10.
+Tick interval milliseconds: expected 10; actual 9.
+************************************************
+Slept for 300 milliseconds.
+Total tick count: 31.
+Elapsed milliseconds
+    Expected: total tick count 31 * interval 10 = 310
+    Measured: 307.
+************************************************
+ZMeasureTickIntervals: testing 100-millisecond tick interval. Sleeping for 3000 milliseconds.
+Tick interval milliseconds: expected 100; actual 7.
+Tick interval milliseconds: expected 100; actual 93.
+Tick interval milliseconds: expected 100; actual 100.
+Tick interval milliseconds: expected 100; actual 100.
+Tick interval milliseconds: expected 100; actual 100.
+Tick interval milliseconds: expected 100; actual 100.
+Tick interval milliseconds: expected 100; actual 100.
+Tick interval milliseconds: expected 100; actual 100.
+Tick interval milliseconds: expected 100; actual 100.
+Tick interval milliseconds: expected 100; actual 100.
+Tick interval milliseconds: expected 100; actual 100.
+Tick interval milliseconds: expected 100; actual 100.
+Tick interval milliseconds: expected 100; actual 100.
+Tick interval milliseconds: expected 100; actual 100.
+Tick interval milliseconds: expected 100; actual 100.
+Tick interval milliseconds: expected 100; actual 100.
+Tick interval milliseconds: expected 100; actual 100.
+Tick interval milliseconds: expected 100; actual 100.
+Tick interval milliseconds: expected 100; actual 100.
+Tick interval milliseconds: expected 100; actual 100.
+Tick interval milliseconds: expected 100; actual 100.
+Tick interval milliseconds: expected 100; actual 100.
+Tick interval milliseconds: expected 100; actual 100.
+Tick interval milliseconds: expected 100; actual 100.
+Tick interval milliseconds: expected 100; actual 100.
+Tick interval milliseconds: expected 100; actual 100.
+Tick interval milliseconds: expected 100; actual 100.
+Tick interval milliseconds: expected 100; actual 100.
+Tick interval milliseconds: expected 100; actual 100.
+Tick interval milliseconds: expected 100; actual 100.
+Tick interval milliseconds: expected 100; actual 100.
+************************************************
+Slept for 3000 milliseconds.
+Total tick count: 31.
+Elapsed milliseconds
+    Expected: total tick count 31 * interval 100 = 3100
+    Measured: 3011.
+************************************************
+ZMeasureTickIntervals: testing 1000-millisecond tick interval. Sleeping for 30000 milliseconds.
+Tick interval milliseconds: expected 1000; actual 97.
+Tick interval milliseconds: expected 1000; actual 902.
+Tick interval milliseconds: expected 1000; actual 1000.
+Tick interval milliseconds: expected 1000; actual 1000.
+Tick interval milliseconds: expected 1000; actual 1000.
+Tick interval milliseconds: expected 1000; actual 1000.
+Tick interval milliseconds: expected 1000; actual 1000.
+Tick interval milliseconds: expected 1000; actual 1000.
+Tick interval milliseconds: expected 1000; actual 1000.
+Tick interval milliseconds: expected 1000; actual 1000.
+Tick interval milliseconds: expected 1000; actual 1000.
+Tick interval milliseconds: expected 1000; actual 1000.
+Tick interval milliseconds: expected 1000; actual 1000.
+Tick interval milliseconds: expected 1000; actual 1000.
+Tick interval milliseconds: expected 1000; actual 1000.
+Tick interval milliseconds: expected 1000; actual 1000.
+Tick interval milliseconds: expected 1000; actual 1000.
+Tick interval milliseconds: expected 1000; actual 1000.
+Tick interval milliseconds: expected 1000; actual 1000.
+Tick interval milliseconds: expected 1000; actual 1000.
+Tick interval milliseconds: expected 1000; actual 1000.
+Tick interval milliseconds: expected 1000; actual 1000.
+Tick interval milliseconds: expected 1000; actual 1000.
+Tick interval milliseconds: expected 1000; actual 1000.
+Tick interval milliseconds: expected 1000; actual 1000.
+Tick interval milliseconds: expected 1000; actual 1000.
+Tick interval milliseconds: expected 1000; actual 1000.
+Tick interval milliseconds: expected 1000; actual 1000.
+Tick interval milliseconds: expected 1000; actual 1000.
+Tick interval milliseconds: expected 1000; actual 1000.
+************************************************
+Slept for 30000 milliseconds.
+Total tick count: 30.
+Elapsed milliseconds
+    Expected: total tick count 30 * interval 1000 = 30000
+    Measured: 30002.
+************************************************
