@@ -7,13 +7,13 @@
         <Platforms>x64</Platforms>
         <IsPackable>false</IsPackable>
     </PropertyGroup>
-    <ItemGroup>
-        <!-- Copy the Rust library to the current output folder. -->
-        <Content Include="..\..\Rust\millisecond_ticker\target\release\millisecond_ticker.dll">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-<!--            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>-->
-        </Content>
-    </ItemGroup>
+<!--    <ItemGroup>-->
+<!--        &lt;!&ndash; Copy the Rust library to the current output folder. &ndash;&gt;-->
+<!--        <Content Include="..\..\Rust\millisecond_ticker\target\release\millisecond_ticker.dll">-->
+<!--            <CopyToOutputDirectory>Always</CopyToOutputDirectory>-->
+<!--&lt;!&ndash;            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>&ndash;&gt;-->
+<!--        </Content>-->
+<!--    </ItemGroup>-->
     <ItemGroup>
         <PackageReference Include="NUnit" Version="4.3.2"/>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1"/>

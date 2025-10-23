@@ -1,8 +1,0 @@
-SPIN-SLEEP
-
-CountTicks: testing 1-millisecond tick interval. Sleeping for 600001 milliseconds.
-Total tick count: 598589.
-Elapsed milliseconds
-    Expected: total tick count 598589 * interval 1 = 598589
-    Measured: 600013.
-So the 598589 ticks were a total of 1.424 seconds fast after 10 minutes sleep.
