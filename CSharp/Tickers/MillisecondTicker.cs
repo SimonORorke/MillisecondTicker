@@ -20,7 +20,7 @@ namespace Simon.Tickers;
 ///     The Rust library must be copied to the executable's output directory.
 ///   </para>
 /// </remarks>
-public partial class MillisecondTicker {
+public partial class MillisecondTicker : IMillisecondTicker {
   private readonly CallbackDelegate _callbackDelegate;
 
   /// <summary>
