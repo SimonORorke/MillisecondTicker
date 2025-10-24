@@ -132,17 +132,18 @@ public class TickerTests {
   [Test]
   public void ZMeasureTickIntervals() {
     Ticker = new MillisecondTicker(OnTickMeasureTickInterval);
+    // The combined results from all of these tests fit within the test output size limit.
+    ZMeasureTickIntervals(1, 30);
+    ZMeasureTickIntervals(10, 30);
+    ZMeasureTickIntervals(100, 30);
+    ZMeasureTickIntervals(1000, 30);
+    
     // The results from any one of these tests fit within the test output size limit
-    ZMeasureTickIntervals(1, 180);
+    // ZMeasureTickIntervals(1, 180);
     // ZMeasureTickIntervals(10, 180);
     // ZMeasureTickIntervals(100, 180);
     // ZMeasureTickIntervals(1000, 180);
 
-    // The combined results from all of these tests fit within the test output size limit.
-    // ZMeasureTickIntervals(1, 30);
-    // ZMeasureTickIntervals(10, 30);
-    // ZMeasureTickIntervals(100, 30);
-    // ZMeasureTickIntervals(1000, 30);
   }
 
   private void ZMeasureTickIntervals(
