@@ -7,12 +7,14 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
-    <ItemGroup>
-        <!-- Copy the Rust library, if changed, to the current output folder. -->
-        <Content Include="..\..\Rust\millisecond_ticker\target\release\millisecond_ticker.dll">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Content>
-    </ItemGroup>
+    <!-- Copy the Rust library, if changed, to the current output folder. -->
+    <!-- Commenting this out because I have not been able to work out how to make
+    it vary by operating system. -->
+<!--    <ItemGroup>-->
+<!--        <Content Include="..\..\Rust\millisecond_ticker\target\release\millisecond_ticker.dll">-->
+<!--            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>-->
+<!--        </Content>-->
+<!--    </ItemGroup>-->
 
     <ItemGroup>
         <ProjectReference Include="..\Tickers\Simon.Tickers.csproj"/>

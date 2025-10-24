@@ -12,8 +12,10 @@
 
     <!-- Copy the Rust library to the RustLibrary subfolder of the solution folder.
     If no other changes have been made, rebuild to make this happen. -->
-    <Target Name="Update Rust Library" BeforeTargets="Compile">
-        <Exec Command="copy ..\..\Rust\millisecond_ticker\target\release\millisecond_ticker.dll; ..\RustLibrary /y"/>
-    </Target>
+    <!-- Commenting this out because I have not been able to work out how to make
+    it vary by operating system. -->
+<!--    <Target Name="Update Rust Library" BeforeTargets="Compile">-->
+<!--        <Exec Command="copy ..\..\Rust\millisecond_ticker\target\release\millisecond_ticker.dll; ..\RustLibrary /y"/>-->
+<!--    </Target>-->
 
 </Project>
