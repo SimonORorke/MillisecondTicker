@@ -6,12 +6,13 @@ namespace Simon.Tickers.Tests;
 /// <summary>
 ///   Results are variable. So, rather than asserting, results are just written to the
 ///   test output.  Summary of test results in Windows.
+///   The <see cref="AverageTickInterval" /> test shows that, as the
+///   <see cref="MillisecondTicker" /> ticks steadily rather than trying to match elapsed
+///   time, the average actual interval is very slightly longer than the specified
+///   interval.
 ///   The <see cref="ZMeasureTickIntervals" /> test shows that the Rust millisecond
 ///   ticker is very steady, though the first one or two ticks can be shaky.  Also,
 ///   see the remarks for <see cref="ZMeasureTickIntervals" /> method.
-///   The <see cref="AverageTickInterval" /> test shows that, as the ticker ticks
-///   steadily rather than trying to match elapsed time, the average actual interval
-///   is very slightly longer than the specified interval.
 ///   The <see cref="Delay" /> and <see cref="Sleep" /> tests show that
 ///   a millisecond ticker made with C# code would be unreliable and often hopelessly
 ///   slow.

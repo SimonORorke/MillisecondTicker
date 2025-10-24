@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 namespace Simon.Tickers;
 
 /// <summary>
-///   A .Net wrapper for a precision ticker that ticks at intervals of one or more
+///   A .Net wrapper for a high-resolution ticker that ticks at intervals of one or more
 ///   milliseconds. For accuracy, the ticker is implemented in Rust.
 /// </summary>
 /// <remarks>
