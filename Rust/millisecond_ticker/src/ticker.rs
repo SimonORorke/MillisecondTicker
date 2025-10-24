@@ -12,7 +12,7 @@ use std::time::Duration;
 /// SteadyClock with SpinWait
 ///     Benchmark test with 1-ms interval specified:
 ///         Average actual interval: 1.00175 ms
-///         CPU usage: 4-9%
+///         CPU usage: 4-9% (Uses the whole of one CPU core.)
 /// std::thread::sleep
 ///     Benchmark test with 1-ms interval specified:
 ///         Average actual interval: 1.51934 ms
