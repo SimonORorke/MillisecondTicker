@@ -10,10 +10,10 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
-<!--    &lt;!&ndash; Copy the Rust library to the RustLibrary subfolder of the solution folder.-->
-<!--    If no other changes have been made, rebuild to make this happen. &ndash;&gt;-->
-<!--    <Target Name="Update Rust Library" BeforeTargets="Compile">-->
-<!--        <Exec Command="copy ..\..\Rust\millisecond_ticker\target\release\millisecond_ticker.dll; ..\RustLibrary /y"/>-->
-<!--    </Target>-->
+    <!-- Copy the Rust library to the RustLibrary subfolder of the solution folder.
+    If no other changes have been made, rebuild to make this happen. -->
+    <Target Name="Update Rust Library" BeforeTargets="Compile">
+        <Exec Command="copy ..\..\Rust\millisecond_ticker\target\release\millisecond_ticker.dll; ..\RustLibrary /y"/>
+    </Target>
 
 </Project>
