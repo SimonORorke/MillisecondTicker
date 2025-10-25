@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace Simon.Tickers;
@@ -35,11 +34,6 @@ public partial class MillisecondTicker : IMillisecondTicker {
     _callbackDelegate = OnRustCallback;
   }
 
-  /// <summary>
-  ///   We currently don't really need this.
-  ///   But see the comment in <see cref="Stop" />.
-  /// </summary>
-  [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Local")]
   private bool IsRunning { get; set; }
   
   private Action OnTick { get; }
@@ -72,6 +66,9 @@ public partial class MillisecondTicker : IMillisecondTicker {
         $"{nameof(millisecondsInterval)} {millisecondsInterval} is invalid. " +
         $"It must be positive.");
     }
+    if (IsRunning) {
+      throw new InvalidOperationException("The ticker is already running.");
+    }
     start_ticker((ulong)millisecondsInterval, _callbackDelegate);
     IsRunning = true;
   }
@@ -81,8 +78,6 @@ public partial class MillisecondTicker : IMillisecondTicker {
   /// </summary>
   public void Stop() {
     stop_ticker();
-    // We currently don't really need IsRunning. But accessing it here prevents the IDE
-    // from complaining about this method not being static.
     IsRunning = false;
   }
 

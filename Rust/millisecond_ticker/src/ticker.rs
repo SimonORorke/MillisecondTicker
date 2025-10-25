@@ -26,6 +26,9 @@ pub struct Ticker {
 
 impl Ticker {
     pub fn new(interval: Duration) -> Self {
+        if interval.as_millis() < 1 {
+            panic!("Interval must be at least 1 millisecond.");
+        }
         Self {
             interval,
             running: Arc::new(AtomicBool::new(false)),
@@ -38,6 +41,9 @@ impl Ticker {
         F: Fn() + Send + Clone + 'static,
     {
         let running = self.running.clone();
+        if running.load(Ordering::SeqCst) {
+            panic!("The ticker is already running.");
+        }
         let interval = self.interval;
         // let spinner = SpinWait::new();
         running.store(true, Ordering::SeqCst);

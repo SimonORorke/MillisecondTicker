@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using NUnit.Framework;
 
 namespace Simon.Tickers.Tests;
@@ -26,12 +27,20 @@ public class TickerTests {
   private Stopwatch Stopwatch { get; } = new Stopwatch();
   private MillisecondTicker Ticker { get; set; } = null!;
 
+  [Test]
+  public void AlreadyRunning() {
+    Ticker = new MillisecondTicker(OnTickMeasureTickInterval);
+    Ticker.Start(1);
+    Assert.Throws<InvalidOperationException>(() => Ticker.Start(1));
+    Ticker.Stop();
+  }
+
   /// <summary>
   ///   Measures the average actual tick interval over 10 minutes for a specified tick
   ///   interval of 1 millisecond. This test also provides an opportunity to monitor the
   ///   ticker's impact on CPU usage.
   /// </summary>
-  [Test]
+  [Test, Explicit, ExcludeFromCodeCoverage]
   public void AverageTickInterval() {
     const int sleepMilliseconds = 1000 * 600; // 10 minutes.
     IntervalMilliseconds = 1;
