@@ -162,7 +162,8 @@ public class TickerTests {
     int sleepMilliseconds = IntervalMilliseconds * waitFactor;
     TestContext.Progress.WriteLine(
       $"ZMeasureTickIntervals: testing {IntervalMilliseconds}-millisecond tick " +
-      $"interval. Sleeping for {sleepMilliseconds} milliseconds.");
+      $"interval.");
+    TestContext.Progress.WriteLine($"Sleeping for {sleepMilliseconds} milliseconds.");
     Interlocked.Exchange(ref _tickCount, 0);
     IntervalLog = new StringWriter();
     var totalStopwatch = new Stopwatch();
