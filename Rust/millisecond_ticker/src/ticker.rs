@@ -47,12 +47,13 @@ impl Ticker {
         let interval = self.interval;
         // let spinner = SpinWait::new();
         running.store(true, Ordering::SeqCst);
-        // We cannot use std::thread::spawn here. If the Avalonia C# application is run
+        // We cannot use std::thread::spawn here. If an Avalonia C# application is run
         // in an IDE (JetBrains Rider or Visual Studio), Rust panics when attempting to spawn,
         // with this error message:
         //     failed to spawn thread: Os { code: 5, kind: PermissionDenied, message: "Access is denied." }
         // Rayon::spawn does not have this problem, as it uses a thread pool that Rayon has created
         // in advance.
+        // The type of spawn used has not made any measurable difference to performance.
         rayon::spawn(move || {
             while running.load(Ordering::SeqCst) {
                 // std::thread::sleep(interval);
