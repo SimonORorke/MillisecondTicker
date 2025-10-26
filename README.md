@@ -6,7 +6,7 @@ The `MillisecondTicker` class provides a high-resolution ticker that ticks at in
 
 The Rust library (**millisecond_ticker.dll** in Windows) must be copied to executable folders, including for any test projects.  To save .Net developers the need to compile the Rust library, the current **millisecond_ticker.dll** can be found in the [CSharp/RustLibrary](CSharp/RustLibrary) folder.  *I would be happy to include the macOS and Linux libraries there, if provided by contributors.* Copying the Rust library to the executable folder can be added to an application/test project file, for example:
 
-```msbuild
+```xml
 <ItemGroup>
     <!-- Copy the Rust library, if changed, to the current output folder. -->
     <Content Include="..\..\..\Simon.MillisecondTicker\CSharp\RustLibrary\millisecond_ticker.dll">
