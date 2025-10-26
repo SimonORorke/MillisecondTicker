@@ -15,7 +15,7 @@ The Rust library (**millisecond_ticker.dll** in Windows) must be copied to execu
 </ItemGroup>
 ```
 
-If you amend the Rust library, for Windows, the latest  **millisecond_ticker.dll** file may be copied to the RustLibrary folder and to the executable folders in the `Simon.Tickers` C# solution with the [CSharp/CopyRustDll.cmd](CSharp/CopyRustDll.cmd ) command file.
+If you amend the Rust library, for Windows the latest  **millisecond_ticker.dll** file may be copied to the RustLibrary folder and to the executable folders in the `Simon.Tickers` C# solution with the [CSharp/CopyRustDll.cmd](CSharp/CopyRustDll.cmd ) command file.
 
 Coding usage of `MillisecondTicker` is straightforward.  A tick callback method, which will be executed in a separate thread, is specified in the constructor.  The ticker is (obviously) started and stopped with the `Start` method, where the tick interval in milliseconds is specified, and the `Stop` method. For usage examples, please refer to the [CSharp/Example](CSharp/Example) and [CSharp/Tests](CSharp/Tests) projects.  `MillisecondTicker` implements an `IMillisecondTicker` interface, which allows the ticker to be mocked in tests.
 
