@@ -10,10 +10,13 @@ namespace Simon.Tickers;
 /// <remarks>
 ///   This is a steady ticker, which means the priority is to tick at equal intervals
 ///   rather than for the total duration of a sequence of ticks to equal the expected
-///   elapsed time. For example, after 60,000 1-millisecond ticks, the elapsed time
-///   might not be exactly one minute.
+///   elapsed time. For example, after 600,000 1-millisecond ticks, the elapsed time
+///   will probably not be exactly ten minutes.
 ///   <para>
-///     In Windows, the durations of the first one or two ticks are usually inaccurate.
+///     In Windows, the durations of the first two ticks are usually inaccurate.
+///     However, the total duration of the two ticks is accurate, except where the
+///     specified interval is 1-millisecond or close to it. This initial inaccuracy may
+///     be trivial in an application.
 ///   </para>
 ///   <para>
 ///     The Rust library must be copied to the executable's output directory.

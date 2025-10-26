@@ -153,7 +153,6 @@ public class TickerTests {
     // ZMeasureTickIntervals(10, 180);
     // ZMeasureTickIntervals(100, 180);
     // ZMeasureTickIntervals(1000, 180);
-
   }
 
   private void ZMeasureTickIntervals(
