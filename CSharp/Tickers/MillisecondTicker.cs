@@ -24,7 +24,7 @@ namespace Simon.Tickers;
 ///   </para>
 /// </remarks>
 public partial class MillisecondTicker : IMillisecondTicker {
-  private CallbackDelegate _callbackDelegate;
+  private readonly CallbackDelegate _callbackDelegate;
 
   /// <summary>
   ///   Instantiates a new ticker, specifying the method to call when the ticker ticks.
@@ -79,6 +79,10 @@ public partial class MillisecondTicker : IMillisecondTicker {
   /// <summary>
   ///   Starts the ticker.
   /// </summary>
+  /// <remarks>
+  ///   To avoid callback delegate garbage collection, instantiate
+  ///   <see cref="MillisecondTicker" /> before each call of <see cref="Start" />.
+  /// </remarks>
   /// <param name="millisecondsInterval">Milliseconds between ticks.</param>
   public void Start(int millisecondsInterval) {
     if (millisecondsInterval < 1) {
@@ -86,19 +90,14 @@ public partial class MillisecondTicker : IMillisecondTicker {
         $"{nameof(millisecondsInterval)} {millisecondsInterval} is invalid. " +
         $"It must be positive.");
     }
-    // If called from an Avalonia application, the exception is thrown even when
-    // IsRunning is false.  So until a fix is found we don't check it.
-    // Calling ticker_is_running() directly does not help.
-    // Maintaining a separate bool, thread-safe or otherwise, does not help either.
-    // if (ticker_is_running() == 1) {
-    //   // if (IsRunning) {
-    //   throw new InvalidOperationException("The ticker is already running.");
-    // }
-    //
+    if (IsRunning) {
+      throw new InvalidOperationException("The ticker is already running.");
+    }
+    // THIS DOES NOT WORK. IT MAKES THE AVALONIA APPLICATION FREEZES WHEN THE TICKER IS
+    // STARTED.
     // If the ticker has previously been stopped, the callback delegate may have
     // been garbage collected. So we need to re-create it each time we start the ticker.
-    // THIS DOES NOT WORK. The Avalonia application crashes when the ticker is started.
-    _callbackDelegate = OnRustCallback;
+    //_callbackDelegate = OnRustCallback;
     start_ticker((ulong)millisecondsInterval, _callbackDelegate);
   }
 
