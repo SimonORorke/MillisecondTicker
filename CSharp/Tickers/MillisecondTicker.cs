@@ -80,8 +80,13 @@ public partial class MillisecondTicker : IMillisecondTicker {
   ///   Starts the ticker.
   /// </summary>
   /// <remarks>
-  ///   To avoid callback delegate garbage collection, instantiate
-  ///   <see cref="MillisecondTicker" /> before each call of <see cref="Start" />.
+  ///   To avoid callback delegate garbage collection, <see cref="MillisecondTicker" />
+  ///   before each call of <see cref="Start" />.
+  ///   To avoid that requirement, we could instead keep the callback delegate alive in a
+  ///   worker thread. But then we would have to make <see cref="MillisecondTicker" />
+  ///   disposable so that the worker thread could poll for disposal and stop itself.
+  ///   I tried that and found that it added tricky complexity in calling
+  ///   applications.
   /// </remarks>
   /// <param name="millisecondsInterval">Milliseconds between ticks.</param>
   public void Start(int millisecondsInterval) {
