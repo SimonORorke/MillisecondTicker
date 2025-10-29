@@ -30,7 +30,9 @@ public class TickerTests {
   [Test]
   public void AlreadyRunning() {
     Ticker = new MillisecondTicker(OnTickMeasureTickInterval);
+    Assert.That(!Ticker.IsRunning);
     Ticker.Start(1);
+    Assert.That(Ticker.IsRunning);
     Assert.Throws<InvalidOperationException>(() => Ticker.Start(1));
     Ticker.Stop();
   }

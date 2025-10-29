@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace Simon.Tickers;
@@ -24,7 +25,6 @@ namespace Simon.Tickers;
 /// </remarks>
 public partial class MillisecondTicker : IMillisecondTicker {
   private readonly CallbackDelegate _callbackDelegate;
-  private int _isRunningBackValue;
 
   /// <summary>
   ///   Instantiates a new ticker, specifying the method to call when the ticker ticks.
@@ -33,25 +33,17 @@ public partial class MillisecondTicker : IMillisecondTicker {
   ///   The callback method, which will run in a separate thread.
   /// </param>
   public MillisecondTicker(Action onTick) {
-    GC.KeepAlive(onTick);
     OnTick = onTick;
     _callbackDelegate = OnRustCallback;
-    IsRunning = false;
   }
-
+  
   /// <summary>
-  ///   Thread safe bool.
+  ///   Whether the ticker is running.
   /// </summary>
-  private bool IsRunning {
-    get => Interlocked.CompareExchange(ref _isRunningBackValue, 1, 1) == 1;
-    set {
-      if (value) {
-        Interlocked.CompareExchange(ref _isRunningBackValue, 1, 0);
-      } else {
-        Interlocked.CompareExchange(ref _isRunningBackValue, 0, 1);
-      }
-    }
-  }
+  [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Global")]
+#pragma warning disable CA1822
+  public bool IsRunning => ticker_is_running() == 1;
+#pragma warning restore CA1822
   
   private Action OnTick { get; }
 
@@ -74,6 +66,17 @@ public partial class MillisecondTicker : IMillisecondTicker {
   private static partial void stop_ticker();
 
   /// <summary>
+  ///   Rust function to stop the ticker.
+  /// </summary>
+  /// <remarks>
+  ///   Handling the return as a Rust/C bool looks like a big problem in C#.
+  ///   So the Rust function returns 1 for true and 0 for false.
+  /// </remarks>
+  [LibraryImport("millisecond_ticker")]
+  [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+  private static partial byte ticker_is_running();
+
+  /// <summary>
   ///   Starts the ticker.
   /// </summary>
   /// <param name="millisecondsInterval">Milliseconds between ticks.</param>
@@ -85,11 +88,13 @@ public partial class MillisecondTicker : IMillisecondTicker {
     }
     // If called from an Avalonia application, the exception is thrown even when
     // IsRunning is false.  So until a fix is found we don't check it.
-    // if (IsRunning) {
+    // Calling ticker_is_running() directly does not help.
+    // Maintaining a separate bool, thread-safe or otherwise, does not help either.
+    // if (ticker_is_running() == 1) {
+    //   // if (IsRunning) {
     //   throw new InvalidOperationException("The ticker is already running.");
     // }
     start_ticker((ulong)millisecondsInterval, _callbackDelegate);
-    IsRunning = true;
   }
 
   /// <summary>
@@ -97,13 +102,12 @@ public partial class MillisecondTicker : IMillisecondTicker {
   /// </summary>
   public void Stop() {
     stop_ticker();
-    IsRunning = false;
   }
 
   private void OnRustCallback() {
+    OnTick();
     // Keep the delegate alive to prevent garbage collection.
     GC.KeepAlive(_callbackDelegate);
-    OnTick();
   }
 
   /// <summary>

@@ -34,6 +34,10 @@ impl Ticker {
             running: Arc::new(AtomicBool::new(false)),
         }
     }
+    
+    pub fn is_running(&self) -> bool {
+        self.running.load(Ordering::SeqCst)
+    }
 
     /// Starts the ticker with a callback.
     pub fn start<F>(&mut self, callback: F)
@@ -53,7 +57,8 @@ impl Ticker {
         //     failed to spawn thread: Os { code: 5, kind: PermissionDenied, message: "Access is denied." }
         // Rayon::spawn does not have this problem, as it uses a thread pool that Rayon has created
         // in advance.
-        // The type of spawn used has not made any measurable difference to performance.
+        // The type of spawn used has not made any measurable difference to performance,
+        // though rayon should be more efficient.
         rayon::spawn(move || {
             while running.load(Ordering::SeqCst) {
                 // std::thread::sleep(interval);

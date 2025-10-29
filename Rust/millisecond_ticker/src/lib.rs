@@ -32,6 +32,10 @@ impl Data {
             }
         }
     }
+
+    fn ticker_is_running(&self) -> bool {
+        self.ticker.is_some() && self.ticker.as_ref().unwrap().lock().unwrap().is_running()
+    }
 }
 
 lazy_static! {
@@ -55,4 +59,17 @@ pub extern "C" fn start_ticker(
 pub extern "C" fn stop_ticker() {
     let mut data = DATA.lock().unwrap();
     data.stop_ticker();
+}
+
+/// Expose this function to C#.
+/// Handling the return as a Rust/C bool looks like a big problem in C#.
+/// So we'll just return 1 for true and 0 for false.
+#[unsafe(no_mangle)]
+pub extern "C" fn ticker_is_running() -> u8 {
+    let data = DATA.lock().unwrap();
+    if data.ticker_is_running() {
+        1
+    } else {
+        0
+    }
 }
