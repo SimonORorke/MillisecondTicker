@@ -24,7 +24,7 @@ namespace Simon.Tickers;
 ///   </para>
 /// </remarks>
 public partial class MillisecondTicker : IMillisecondTicker {
-  private readonly CallbackDelegate _callbackDelegate;
+  private CallbackDelegate _callbackDelegate;
 
   /// <summary>
   ///   Instantiates a new ticker, specifying the method to call when the ticker ticks.
@@ -94,6 +94,11 @@ public partial class MillisecondTicker : IMillisecondTicker {
     //   // if (IsRunning) {
     //   throw new InvalidOperationException("The ticker is already running.");
     // }
+    //
+    // If the ticker has previously been stopped, the callback delegate may have
+    // been garbage collected. So we need to re-create it each time we start the ticker.
+    // THIS DOES NOT WORK. The Avalonia application crashes when the ticker is started.
+    _callbackDelegate = OnRustCallback;
     start_ticker((ulong)millisecondsInterval, _callbackDelegate);
   }
 
