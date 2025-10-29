@@ -24,6 +24,7 @@ namespace Simon.Tickers;
 /// </remarks>
 public partial class MillisecondTicker : IMillisecondTicker {
   private readonly CallbackDelegate _callbackDelegate;
+  private int _isRunningBackValue;
 
   /// <summary>
   ///   Instantiates a new ticker, specifying the method to call when the ticker ticks.
@@ -32,12 +33,25 @@ public partial class MillisecondTicker : IMillisecondTicker {
   ///   The callback method, which will run in a separate thread.
   /// </param>
   public MillisecondTicker(Action onTick) {
+    GC.KeepAlive(onTick);
     OnTick = onTick;
-    // Keep the delegate alive to prevent garbage collection.
     _callbackDelegate = OnRustCallback;
+    IsRunning = false;
   }
 
-  private bool IsRunning { get; set; }
+  /// <summary>
+  ///   Thread safe bool.
+  /// </summary>
+  private bool IsRunning {
+    get => Interlocked.CompareExchange(ref _isRunningBackValue, 1, 1) == 1;
+    set {
+      if (value) {
+        Interlocked.CompareExchange(ref _isRunningBackValue, 1, 0);
+      } else {
+        Interlocked.CompareExchange(ref _isRunningBackValue, 0, 1);
+      }
+    }
+  }
   
   private Action OnTick { get; }
 
@@ -69,9 +83,11 @@ public partial class MillisecondTicker : IMillisecondTicker {
         $"{nameof(millisecondsInterval)} {millisecondsInterval} is invalid. " +
         $"It must be positive.");
     }
-    if (IsRunning) {
-      throw new InvalidOperationException("The ticker is already running.");
-    }
+    // If called from an Avalonia application, the exception is thrown even when
+    // IsRunning is false.  So until a fix is found we don't check it.
+    // if (IsRunning) {
+    //   throw new InvalidOperationException("The ticker is already running.");
+    // }
     start_ticker((ulong)millisecondsInterval, _callbackDelegate);
     IsRunning = true;
   }
@@ -85,6 +101,8 @@ public partial class MillisecondTicker : IMillisecondTicker {
   }
 
   private void OnRustCallback() {
+    // Keep the delegate alive to prevent garbage collection.
+    GC.KeepAlive(_callbackDelegate);
     OnTick();
   }
 
