@@ -1,6 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 
 namespace Simon.Tickers;
 
@@ -23,8 +21,8 @@ namespace Simon.Tickers;
 ///     The Rust library must be copied to the executable's output directory.
 ///   </para>
 /// </remarks>
-public partial class MillisecondTicker : IMillisecondTicker {
-  private readonly CallbackDelegate _callbackDelegate;
+public class MillisecondTicker : IMillisecondTicker {
+  private readonly RustFunctions.CallbackDelegate _callbackDelegate;
 
   /// <summary>
   ///   Instantiates a new ticker, specifying the method to call when the ticker ticks.
@@ -44,39 +42,10 @@ public partial class MillisecondTicker : IMillisecondTicker {
   /// </summary>
   [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Global")]
 #pragma warning disable CA1822
-  public bool IsRunning => ticker_is_running() == 1;
+  public bool IsRunning => RustFunctions.ticker_is_running() == 1;
 #pragma warning restore CA1822
   
   private Action OnTick { get; }
-
-  /// <summary>
-  ///   Rust function to start the ticker.
-  /// </summary>
-  /// <param name="millisecondsInterval">Milliseconds between ticks.</param>
-  /// <param name="callback">Callback to run when the ticker ticks.</param>
-  [LibraryImport("millisecond_ticker")]
-  [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-  private static partial void start_ticker(
-    ulong millisecondsInterval,
-    CallbackDelegate callback);
-
-  /// <summary>
-  ///   Rust function to stop the ticker.
-  /// </summary>
-  [LibraryImport("millisecond_ticker")]
-  [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-  private static partial void stop_ticker();
-
-  /// <summary>
-  ///   Rust function to stop the ticker.
-  /// </summary>
-  /// <remarks>
-  ///   Handling the return as a Rust/C bool looks like a big problem in C#.
-  ///   So the Rust function returns 1 for true and 0 for false.
-  /// </remarks>
-  [LibraryImport("millisecond_ticker")]
-  [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-  private static partial byte ticker_is_running();
 
   /// <summary>
   ///   Starts the ticker.
@@ -111,7 +80,7 @@ public partial class MillisecondTicker : IMillisecondTicker {
     // If the ticker has previously been stopped, the callback delegate may have
     // been garbage collected. So we need to re-create it each time we start the ticker.
     //_callbackDelegate = OnRustCallback;
-    start_ticker((ulong)millisecondsInterval, _callbackDelegate);
+    RustFunctions.start_ticker((ulong)millisecondsInterval, _callbackDelegate);
     HasStarted = true;
   }
 
@@ -119,7 +88,7 @@ public partial class MillisecondTicker : IMillisecondTicker {
   ///   Stops the ticker.
   /// </summary>
   public void Stop() {
-    stop_ticker();
+    RustFunctions.stop_ticker();
   }
 
   private void OnRustCallback() {
@@ -127,11 +96,4 @@ public partial class MillisecondTicker : IMillisecondTicker {
     // Keep the delegate alive to prevent garbage collection.
     GC.KeepAlive(_callbackDelegate);
   }
-
-  /// <summary>
-  ///   Delegate matching Rust's callback signature.
-  ///   In this case, it's as simple as it gets.
-  /// </summary>
-  [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-  private delegate void CallbackDelegate();
 }
