@@ -26,6 +26,17 @@ public class TickerTests {
   private int IntervalMilliseconds { get; set; }
   private Stopwatch Stopwatch { get; } = new Stopwatch();
   private MillisecondTicker Ticker { get; set; } = null!;
+  
+  [Test]
+  public void AllowRestart() {
+    Ticker = new MillisecondTicker(OnTickMeasureTickInterval);
+    Ticker.Start(1);
+    Thread.Sleep(10);
+    Ticker.Stop();
+    Assert.DoesNotThrow(() => Ticker.Start(1));
+    Thread.Sleep(10);
+    Ticker.Stop();
+  }
 
   [Test]
   public void AlreadyRunning() {
@@ -45,6 +56,7 @@ public class TickerTests {
   [Test, Explicit, ExcludeFromCodeCoverage]
   public void AverageTickInterval() {
     const int sleepMilliseconds = 1000 * 600; // 10 minutes.
+    // const int sleepMilliseconds = 1000 * 10; // 10 seconds.
     IntervalMilliseconds = 1;
     TestContext.Progress.WriteLine("AverageTickInterval Test");
     TestContext.Progress.WriteLine(
@@ -97,18 +109,36 @@ public class TickerTests {
       $"Tested Delay, actual was {Stopwatch.ElapsedMilliseconds} milliseconds.");
   }
 
-  // [Test]
-  // public void DisallowRestart() {
-  //   Ticker = new MillisecondTicker(OnTickMeasureTickInterval);
-  //   Ticker.Start(1);
-  //   Ticker.Stop();
-  //   Assert.Throws<InvalidOperationException>(() => Ticker.Start(1));
-  // }
 
   [Test]
   public void InvalidInterval() {
     Ticker = new MillisecondTicker(OnTickMeasureTickInterval);
     Assert.Throws<ArgumentException>(() => Ticker.Start(0));
+  }
+
+  [Test, Explicit, ExcludeFromCodeCoverage]
+  public void KeepCallbackDelegateAlive() {
+    IntervalMilliseconds = 1000 * 60; // 1 minute.
+    int sleepMilliseconds = IntervalMilliseconds * 2 + 1000;
+    TestContext.Progress.WriteLine(
+      $"KeepCallbackDelegateAlive: testing {IntervalMilliseconds}-millisecond tick " +
+      $"interval.");
+    TestContext.Progress.WriteLine($"Sleeping for {sleepMilliseconds} milliseconds.");
+    Interlocked.Exchange(ref _tickCount, 0);
+    Ticker = new MillisecondTicker(OnTickIncrementTickCount);
+    Stopwatch.Restart();
+    Ticker.Start(IntervalMilliseconds);
+    Thread.Sleep(sleepMilliseconds);
+    // For greatest accuracy, stop the stopwatch before calling Stop() on the ticker.
+    Stopwatch.Stop();
+    Ticker.Stop();
+    long tickCount = Interlocked.Read(ref _tickCount);
+    TestContext.Progress.WriteLine("************************************************");
+    TestContext.Progress.WriteLine("Elapsed milliseconds measured:");
+    TestContext.Progress.WriteLine(
+      $"    {Stopwatch.ElapsedMilliseconds}.");
+    TestContext.Progress.WriteLine($"Total tick count: {tickCount}.");
+    TestContext.Progress.WriteLine("************************************************");
   }
 
   /// <summary>

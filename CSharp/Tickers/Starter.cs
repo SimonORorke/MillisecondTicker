@@ -2,6 +2,14 @@
 
 namespace Simon.Tickers;
 
+/// <summary>
+///   A separate class to start the ticker and hold the callback delegate.
+/// </summary>
+/// <remarks>
+///   To prevent the callback delegate from being garbage collected,
+///   a new instance of the <see cref="Starter "/> class must created for each call of
+///   the <see cref="Start" /> method.
+/// </remarks>
 [ExcludeFromCodeCoverage]
 internal class Starter {
   private RustFunctions.CallbackDelegate _callbackDelegate = null!;
@@ -9,11 +17,19 @@ internal class Starter {
   private bool HasStarted { get; set; }
   private Action OnTick { get; set; } = null!;
 
+  /// <summary>
+  ///   Starts the ticker.
+  /// </summary>
+  /// <param name="millisecondsInterval">Milliseconds between ticks.</param>
+  /// <param name="onTick">
+  ///   The callback method, which will run in a separate thread.
+  /// </param>
   internal void Start(int millisecondsInterval, Action onTick) {
     if (HasStarted) {
       throw new InvalidOperationException(
-        "The ticker has been started before. Multiple calls to Start are not " +
-        "allowed. You must create a new Starter instance and start that.");
+        "To prevent the callback delegate from being garbage collected, multiple " +
+        "calls to Start are not allowed. You must create a new Starter instance and " +
+        "start that.");
     }
     OnTick = onTick;
     _callbackDelegate = OnRustCallback;
@@ -21,9 +37,10 @@ internal class Starter {
     HasStarted = true;
   } 
 
+  /// <summary>
+  ///   Runs the callback method in a separate thread.
+  /// </summary>
   private void OnRustCallback() {
     OnTick();
-    // Keep the delegate alive to prevent garbage collection.
-    GC.KeepAlive(_callbackDelegate);
   }
 }

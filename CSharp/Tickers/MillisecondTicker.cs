@@ -22,8 +22,6 @@ namespace Simon.Tickers;
 ///   </para>
 /// </remarks>
 public class MillisecondTicker : IMillisecondTicker {
-  // private readonly RustFunctions.CallbackDelegate _callbackDelegate;
-
   /// <summary>
   ///   Instantiates a new ticker, specifying the method to call when the ticker ticks.
   /// </summary>
@@ -32,10 +30,10 @@ public class MillisecondTicker : IMillisecondTicker {
   /// </param>
   public MillisecondTicker(Action onTick) {
     OnTick = onTick;
-    // _callbackDelegate = OnRustCallback;
   }
 
-  // private bool HasStarted { get; set; }
+  private Action OnTick { get; }
+  private Starter? Starter { get; set; }
 
   /// <summary>
   ///   Whether the ticker is running.
@@ -44,29 +42,13 @@ public class MillisecondTicker : IMillisecondTicker {
 #pragma warning disable CA1822
   public bool IsRunning => RustFunctions.ticker_is_running() == 1;
 #pragma warning restore CA1822
-  
-  private Action OnTick { get; }
 
   /// <summary>
   ///   Starts the ticker.
   /// </summary>
-  /// <remarks>
-  ///   To avoid callback delegate garbage collection, instantiate
-  ///   <see cref="MillisecondTicker" /> before each call of <see cref="Start" />.
-  ///   To avoid that requirement, I tried instead keeping the callback delegate alive
-  ///   in a worker thread. But then we would have to make
-  ///   <see cref="MillisecondTicker" /> disposable so that the worker thread could poll
-  ///   for disposal and stop itself.
-  ///   I tried that and found that it caused problems in applications.
-  /// </remarks>
   /// <param name="millisecondsInterval">Milliseconds between ticks.</param>
   public void Start(int millisecondsInterval) {
-    // if (HasStarted) {
-    //   throw new InvalidOperationException(
-    //     "The ticker has been started before. Multiple calls to Start are not " +
-    //     "allowed. You must create a new MillisecondTicker instance and start that.");
-    // }
-    if (millisecondsInterval < 0) {}
+    if (millisecondsInterval < 0) { }
     if (millisecondsInterval < 1) {
       throw new ArgumentException(
         $"{nameof(millisecondsInterval)} {millisecondsInterval} is invalid. " +
@@ -75,15 +57,11 @@ public class MillisecondTicker : IMillisecondTicker {
     if (IsRunning) {
       throw new InvalidOperationException("The ticker is already running.");
     }
-    var starter = new Starter();
-    starter.Start(millisecondsInterval, OnTick);
-    // // THIS DOES NOT WORK. IT MAKES THE AVALONIA APPLICATION FREEZES WHEN THE TICKER IS
-    // // STARTED.
-    // // If the ticker has previously been stopped, the callback delegate may have
-    // // been garbage collected. So we need to re-create it each time we start the ticker.
-    // //_callbackDelegate = OnRustCallback;
-    // RustFunctions.start_ticker((ulong)millisecondsInterval, _callbackDelegate);
-    // HasStarted = true;
+    // The Starter contains the Rust callback delegate. So instantiating the Starter
+    // each time the ticker is started prevents the callback delegate from being
+    // garbage collected.
+    Starter = new Starter();
+    Starter.Start(millisecondsInterval, OnTick);
   }
 
   /// <summary>
@@ -92,10 +70,4 @@ public class MillisecondTicker : IMillisecondTicker {
   public void Stop() {
     RustFunctions.stop_ticker();
   }
-  //
-  // private void OnRustCallback() {
-  //   OnTick();
-  //   // Keep the delegate alive to prevent garbage collection.
-  //   GC.KeepAlive(_callbackDelegate);
-  // }
 }
