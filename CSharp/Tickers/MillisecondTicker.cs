@@ -36,7 +36,9 @@ public partial class MillisecondTicker : IMillisecondTicker {
     OnTick = onTick;
     _callbackDelegate = OnRustCallback;
   }
-  
+
+  private bool HasStarted { get; set; }
+
   /// <summary>
   ///   Whether the ticker is running.
   /// </summary>
@@ -80,8 +82,8 @@ public partial class MillisecondTicker : IMillisecondTicker {
   ///   Starts the ticker.
   /// </summary>
   /// <remarks>
-  ///   To avoid callback delegate garbage collection, <see cref="MillisecondTicker" />
-  ///   before each call of <see cref="Start" />.
+  ///   To avoid callback delegate garbage collection, instantiate
+  ///   <see cref="MillisecondTicker" /> before each call of <see cref="Start" />.
   ///   To avoid that requirement, we could instead keep the callback delegate alive in a
   ///   worker thread. But then we would have to make <see cref="MillisecondTicker" />
   ///   disposable so that the worker thread could poll for disposal and stop itself.
@@ -90,6 +92,12 @@ public partial class MillisecondTicker : IMillisecondTicker {
   /// </remarks>
   /// <param name="millisecondsInterval">Milliseconds between ticks.</param>
   public void Start(int millisecondsInterval) {
+    if (HasStarted) {
+      throw new InvalidOperationException(
+        "The ticker has been started before. Multiple calls to Start are not " +
+        "allowed. You must create a new MillisecondTicker instance and start that.");
+    }
+    if (millisecondsInterval < 0) {}
     if (millisecondsInterval < 1) {
       throw new ArgumentException(
         $"{nameof(millisecondsInterval)} {millisecondsInterval} is invalid. " +
@@ -104,6 +112,7 @@ public partial class MillisecondTicker : IMillisecondTicker {
     // been garbage collected. So we need to re-create it each time we start the ticker.
     //_callbackDelegate = OnRustCallback;
     start_ticker((ulong)millisecondsInterval, _callbackDelegate);
+    HasStarted = true;
   }
 
   /// <summary>

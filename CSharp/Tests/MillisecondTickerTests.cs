@@ -98,6 +98,14 @@ public class TickerTests {
   }
 
   [Test]
+  public void DisallowRestart() {
+    Ticker = new MillisecondTicker(OnTickMeasureTickInterval);
+    Ticker.Start(1);
+    Ticker.Stop();
+    Assert.Throws<InvalidOperationException>(() => Ticker.Start(1));
+  }
+
+  [Test]
   public void InvalidInterval() {
     Ticker = new MillisecondTicker(OnTickMeasureTickInterval);
     Assert.Throws<ArgumentException>(() => Ticker.Start(0));
@@ -143,7 +151,6 @@ public class TickerTests {
   /// </remarks>
   [Test]
   public void ZMeasureTickIntervals() {
-    Ticker = new MillisecondTicker(OnTickMeasureTickInterval);
     // The combined results from all of these tests fit within the test output size limit.
     ZMeasureTickIntervals(1, 30);
     ZMeasureTickIntervals(10, 30);
@@ -167,6 +174,7 @@ public class TickerTests {
     TestContext.Progress.WriteLine($"Sleeping for {sleepMilliseconds} milliseconds.");
     Interlocked.Exchange(ref _tickCount, 0);
     IntervalLog = new StringWriter();
+    Ticker = new MillisecondTicker(OnTickMeasureTickInterval);
     var totalStopwatch = new Stopwatch();
     totalStopwatch.Start();
     Stopwatch.Restart();
