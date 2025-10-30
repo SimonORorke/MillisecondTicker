@@ -22,7 +22,7 @@ namespace Simon.Tickers;
 ///   </para>
 /// </remarks>
 public class MillisecondTicker : IMillisecondTicker {
-  private readonly RustFunctions.CallbackDelegate _callbackDelegate;
+  // private readonly RustFunctions.CallbackDelegate _callbackDelegate;
 
   /// <summary>
   ///   Instantiates a new ticker, specifying the method to call when the ticker ticks.
@@ -32,10 +32,10 @@ public class MillisecondTicker : IMillisecondTicker {
   /// </param>
   public MillisecondTicker(Action onTick) {
     OnTick = onTick;
-    _callbackDelegate = OnRustCallback;
+    // _callbackDelegate = OnRustCallback;
   }
 
-  private bool HasStarted { get; set; }
+  // private bool HasStarted { get; set; }
 
   /// <summary>
   ///   Whether the ticker is running.
@@ -61,11 +61,11 @@ public class MillisecondTicker : IMillisecondTicker {
   /// </remarks>
   /// <param name="millisecondsInterval">Milliseconds between ticks.</param>
   public void Start(int millisecondsInterval) {
-    if (HasStarted) {
-      throw new InvalidOperationException(
-        "The ticker has been started before. Multiple calls to Start are not " +
-        "allowed. You must create a new MillisecondTicker instance and start that.");
-    }
+    // if (HasStarted) {
+    //   throw new InvalidOperationException(
+    //     "The ticker has been started before. Multiple calls to Start are not " +
+    //     "allowed. You must create a new MillisecondTicker instance and start that.");
+    // }
     if (millisecondsInterval < 0) {}
     if (millisecondsInterval < 1) {
       throw new ArgumentException(
@@ -75,13 +75,15 @@ public class MillisecondTicker : IMillisecondTicker {
     if (IsRunning) {
       throw new InvalidOperationException("The ticker is already running.");
     }
-    // THIS DOES NOT WORK. IT MAKES THE AVALONIA APPLICATION FREEZES WHEN THE TICKER IS
-    // STARTED.
-    // If the ticker has previously been stopped, the callback delegate may have
-    // been garbage collected. So we need to re-create it each time we start the ticker.
-    //_callbackDelegate = OnRustCallback;
-    RustFunctions.start_ticker((ulong)millisecondsInterval, _callbackDelegate);
-    HasStarted = true;
+    var starter = new Starter();
+    starter.Start(millisecondsInterval, OnTick);
+    // // THIS DOES NOT WORK. IT MAKES THE AVALONIA APPLICATION FREEZES WHEN THE TICKER IS
+    // // STARTED.
+    // // If the ticker has previously been stopped, the callback delegate may have
+    // // been garbage collected. So we need to re-create it each time we start the ticker.
+    // //_callbackDelegate = OnRustCallback;
+    // RustFunctions.start_ticker((ulong)millisecondsInterval, _callbackDelegate);
+    // HasStarted = true;
   }
 
   /// <summary>
@@ -90,10 +92,10 @@ public class MillisecondTicker : IMillisecondTicker {
   public void Stop() {
     RustFunctions.stop_ticker();
   }
-
-  private void OnRustCallback() {
-    OnTick();
-    // Keep the delegate alive to prevent garbage collection.
-    GC.KeepAlive(_callbackDelegate);
-  }
+  //
+  // private void OnRustCallback() {
+  //   OnTick();
+  //   // Keep the delegate alive to prevent garbage collection.
+  //   GC.KeepAlive(_callbackDelegate);
+  // }
 }

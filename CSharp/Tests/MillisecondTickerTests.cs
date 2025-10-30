@@ -97,13 +97,13 @@ public class TickerTests {
       $"Tested Delay, actual was {Stopwatch.ElapsedMilliseconds} milliseconds.");
   }
 
-  [Test]
-  public void DisallowRestart() {
-    Ticker = new MillisecondTicker(OnTickMeasureTickInterval);
-    Ticker.Start(1);
-    Ticker.Stop();
-    Assert.Throws<InvalidOperationException>(() => Ticker.Start(1));
-  }
+  // [Test]
+  // public void DisallowRestart() {
+  //   Ticker = new MillisecondTicker(OnTickMeasureTickInterval);
+  //   Ticker.Start(1);
+  //   Ticker.Stop();
+  //   Assert.Throws<InvalidOperationException>(() => Ticker.Start(1));
+  // }
 
   [Test]
   public void InvalidInterval() {
