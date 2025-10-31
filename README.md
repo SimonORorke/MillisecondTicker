@@ -1,6 +1,6 @@
 # Millisecond Ticker: High Resolution Ticker for .Net using Rust
 
-The `MillisecondTicker` class provides a high-resolution ticker that ticks at intervals of one or more milliseconds. It has been tested on Windows but should also work on macOS and Linux. For accuracy, the ticker is actually implemented as a Rust library, for which `MillisecondTicker` is a .Net wrapper. This is a steady ticker, which means the priority is to tick at equal intervals rather than for the total duration of a sequence of ticks to equal the expected elapsed time. For example, after 600,000 1-millisecond ticks, the elapsed time will probably not be exactly ten minutes.
+The `MillisecondTicker` class provides a precision ticker that ticks at intervals of one or more milliseconds. It has been tested on Windows but should also work on macOS and Linux. For accuracy, the ticker is actually implemented as a Rust library, for which `MillisecondTicker` is a .Net wrapper. This is a steady ticker, which means the priority is to tick at equal intervals rather than for the total duration of a sequence of ticks to equal the expected elapsed time. For example, after 600,000 1-millisecond ticks, the elapsed time will probably not be exactly ten minutes.
 
 ## Usage
 
