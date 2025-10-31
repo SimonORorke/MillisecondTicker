@@ -36,7 +36,6 @@ public class MillisecondTicker : IMillisecondTicker {
   }
 
   private Action OnTick { get; }
-  private Starter? Starter { get; set; }
 
   /// <summary>
   ///   Whether the ticker is running.
@@ -60,11 +59,6 @@ public class MillisecondTicker : IMillisecondTicker {
     if (IsRunning) {
       throw new InvalidOperationException("The ticker is already running.");
     }
-    // The Starter contains the Rust callback delegate. So holding the Starter in a 
-    // property and instantiating it each time the ticker is started prevents the
-    // callback delegate from being garbage collected.
-    // Starter = new Starter();
-    // Starter.Start(millisecondsInterval, OnTick);
     RustFunctions.start_ticker((ulong)millisecondsInterval, _callbackDelegate);
   }
 

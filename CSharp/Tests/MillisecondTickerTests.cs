@@ -116,6 +116,11 @@ public class TickerTests {
     Assert.Throws<ArgumentException>(() => Ticker.Start(0));
   }
 
+  /// <summary>
+  ///   This turns out not to be a realistic test.  It always passes, even with the
+  ///   old version of MillisecondTicker, which still fails immediately in the Avalonia
+  ///   application.
+  /// </summary>
   [Test, Explicit, ExcludeFromCodeCoverage]
   public void KeepCallbackDelegateAlive() {
     IntervalMilliseconds = 1000; // 1 second.

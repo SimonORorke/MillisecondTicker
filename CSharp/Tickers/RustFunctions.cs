@@ -3,6 +3,15 @@ using System.Runtime.InteropServices;
 
 namespace Simon.Tickers;
 
+/// <summary>
+///   Having the Rust functions in this separate static class rather than in the
+///   <see cref="MillisecondTicker" /> class makes the difference between the ticker
+///   working and not working in the Avalonia application, even though the problem could
+///   not be reproduced in a console application or the unit tests.
+///   The reason the fix works is unclear, but may have something to do with 
+///   preventing the callback delegate from being garbage collected, which was happening
+///   in the Avalonia application at one point.
+/// </summary>
 internal static partial class RustFunctions {
   /// <summary>
   ///   Rust function to start the ticker.
@@ -23,7 +32,7 @@ internal static partial class RustFunctions {
   internal static partial void stop_ticker();
 
   /// <summary>
-  ///   Rust function to stop the ticker.
+  ///   Rust function to return whether the ticker is running.
   /// </summary>
   /// <remarks>
   ///   Handling the return as a Rust/C bool looks like a big problem in C#.
