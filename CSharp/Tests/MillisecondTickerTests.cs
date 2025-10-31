@@ -120,25 +120,34 @@ public class TickerTests {
   public void KeepCallbackDelegateAlive() {
     IntervalMilliseconds = 1000 * 60; // 1 minute.
     int sleepMilliseconds = IntervalMilliseconds * 2 + 1000;
+    Ticker = new MillisecondTicker(OnTickIncrementTickCount);
     TestContext.Progress.WriteLine(
       $"KeepCallbackDelegateAlive: testing {IntervalMilliseconds}-millisecond tick " +
       $"interval.");
-    TestContext.Progress.WriteLine($"Sleeping for {sleepMilliseconds} milliseconds.");
-    Interlocked.Exchange(ref _tickCount, 0);
-    Ticker = new MillisecondTicker(OnTickIncrementTickCount);
-    Stopwatch.Restart();
-    Ticker.Start(IntervalMilliseconds);
-    Thread.Sleep(sleepMilliseconds);
-    // For greatest accuracy, stop the stopwatch before calling Stop() on the ticker.
-    Stopwatch.Stop();
-    Ticker.Stop();
-    long tickCount = Interlocked.Read(ref _tickCount);
-    TestContext.Progress.WriteLine("************************************************");
-    TestContext.Progress.WriteLine("Elapsed milliseconds measured:");
+    SleepAndMeasure();
     TestContext.Progress.WriteLine(
-      $"    {Stopwatch.ElapsedMilliseconds}.");
-    TestContext.Progress.WriteLine($"Total tick count: {tickCount}.");
-    TestContext.Progress.WriteLine("************************************************");
+      $"Sleeping for {IntervalMilliseconds} milliseconds before testing restart.");
+    Thread.Sleep(IntervalMilliseconds);
+    TestContext.Progress.WriteLine("Testing restart.");
+    SleepAndMeasure();
+    return;
+
+    void SleepAndMeasure() {
+      TestContext.Progress.WriteLine($"Sleeping for {sleepMilliseconds} milliseconds.");
+      Interlocked.Exchange(ref _tickCount, 0);
+      Stopwatch.Restart();
+      Ticker.Start(IntervalMilliseconds);
+      Thread.Sleep(sleepMilliseconds);
+      // For greatest accuracy, stop the stopwatch before calling Stop() on the ticker.
+      Stopwatch.Stop();
+      Ticker.Stop();
+      long tickCount = Interlocked.Read(ref _tickCount);
+      TestContext.Progress.WriteLine("************************************************");
+      TestContext.Progress.WriteLine(
+        $"Elapsed milliseconds measured: {Stopwatch.ElapsedMilliseconds}.");
+      TestContext.Progress.WriteLine($"Total tick count: {tickCount}.");
+      TestContext.Progress.WriteLine("************************************************");
+    }
   }
 
   /// <summary>
