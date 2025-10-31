@@ -22,6 +22,8 @@ namespace Simon.Tickers;
 ///   </para>
 /// </remarks>
 public class MillisecondTicker : IMillisecondTicker {
+  private readonly RustFunctions.CallbackDelegate _callbackDelegate;
+  
   /// <summary>
   ///   Instantiates a new ticker, specifying the method to call when the ticker ticks.
   /// </summary>
@@ -30,6 +32,7 @@ public class MillisecondTicker : IMillisecondTicker {
   /// </param>
   public MillisecondTicker(Action onTick) {
     OnTick = onTick;
+    _callbackDelegate = OnRustCallback;
   }
 
   private Action OnTick { get; }
@@ -60,8 +63,9 @@ public class MillisecondTicker : IMillisecondTicker {
     // The Starter contains the Rust callback delegate. So holding the Starter in a 
     // property and instantiating it each time the ticker is started prevents the
     // callback delegate from being garbage collected.
-    Starter = new Starter();
-    Starter.Start(millisecondsInterval, OnTick);
+    // Starter = new Starter();
+    // Starter.Start(millisecondsInterval, OnTick);
+    RustFunctions.start_ticker((ulong)millisecondsInterval, _callbackDelegate);
   }
 
   /// <summary>
@@ -69,5 +73,12 @@ public class MillisecondTicker : IMillisecondTicker {
   /// </summary>
   public void Stop() {
     RustFunctions.stop_ticker();
+  }
+
+  /// <summary>
+  ///   Runs the callback method in a separate thread.
+  /// </summary>
+  private void OnRustCallback() {
+    OnTick();
   }
 }

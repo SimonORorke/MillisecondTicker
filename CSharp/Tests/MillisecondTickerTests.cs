@@ -118,17 +118,22 @@ public class TickerTests {
 
   [Test, Explicit, ExcludeFromCodeCoverage]
   public void KeepCallbackDelegateAlive() {
-    IntervalMilliseconds = 1000 * 60; // 1 minute.
-    int sleepMilliseconds = IntervalMilliseconds * 2 + 1000;
+    IntervalMilliseconds = 1000; // 1 second.
+    // IntervalMilliseconds = 1000 * 60; // 1 minute.
+    int sleepMilliseconds = IntervalMilliseconds * 2 + 100;
     Ticker = new MillisecondTicker(OnTickIncrementTickCount);
     TestContext.Progress.WriteLine(
       $"KeepCallbackDelegateAlive: testing {IntervalMilliseconds}-millisecond tick " +
       $"interval.");
     SleepAndMeasure();
-    TestContext.Progress.WriteLine(
-      $"Sleeping for {IntervalMilliseconds} milliseconds before testing restart.");
-    Thread.Sleep(IntervalMilliseconds);
-    TestContext.Progress.WriteLine("Testing restart.");
+    GC.WaitForPendingFinalizers();
+    GC.Collect();
+    GC.WaitForFullGCComplete();
+    TestContext.Progress.WriteLine("Testing restart after garbage collection.");
+    // TestContext.Progress.WriteLine(
+    //   $"Sleeping for {IntervalMilliseconds} milliseconds before testing restart.");
+    // Thread.Sleep(IntervalMilliseconds);
+    // TestContext.Progress.WriteLine("Testing restart.");
     SleepAndMeasure();
     return;
 
