@@ -10,6 +10,10 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+      <DocumentationFile>bin\x64\Release\Simon.Tickers.xml</DocumentationFile>
+    </PropertyGroup>
+
     <!-- Copy the Rust library to the RustLibrary subfolder of the solution folder.
     If no other changes have been made, rebuild to make this happen. -->
     <!-- Commenting this out because I have not been able to work out how to make
