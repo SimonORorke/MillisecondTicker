@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 namespace Simon.Tickers;
 
 /// <summary>
-///   Having the Rust functions in this separate static class rather than in the
+///   Having the Rust methods in this separate static class rather than in the
 ///   <see cref="MillisecondTicker" /> class makes the difference between the ticker
 ///   working and not working in the Avalonia application, even though the problem could
 ///   not be reproduced in a console application or the unit tests.
@@ -12,7 +12,7 @@ namespace Simon.Tickers;
 ///   preventing the callback delegate from being garbage collected, which was happening
 ///   in the Avalonia application at one point.
 /// </summary>
-internal static partial class RustFunctions {
+internal static partial class RustMethods {
   /// <summary>
   ///   Rust function to start the ticker.
   /// </summary>

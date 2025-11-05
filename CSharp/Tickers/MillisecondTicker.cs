@@ -22,7 +22,7 @@ namespace Simon.Tickers;
 ///   </para>
 /// </remarks>
 public class MillisecondTicker : IMillisecondTicker {
-  private readonly RustFunctions.CallbackDelegate _callbackDelegate;
+  private readonly RustMethods.CallbackDelegate _callbackDelegate;
   
   /// <summary>
   ///   Instantiates a new ticker, specifying the method to call when the ticker ticks.
@@ -42,7 +42,7 @@ public class MillisecondTicker : IMillisecondTicker {
   /// </summary>
   [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Global")]
 #pragma warning disable CA1822
-  public bool IsRunning => RustFunctions.ticker_is_running() == 1;
+  public bool IsRunning => RustMethods.ticker_is_running() == 1;
 #pragma warning restore CA1822
 
   /// <summary>
@@ -59,14 +59,14 @@ public class MillisecondTicker : IMillisecondTicker {
     if (IsRunning) {
       throw new InvalidOperationException("The ticker is already running.");
     }
-    RustFunctions.start_ticker((ulong)millisecondsInterval, _callbackDelegate);
+    RustMethods.start_ticker((ulong)millisecondsInterval, _callbackDelegate);
   }
 
   /// <summary>
   ///   Stops the ticker.
   /// </summary>
   public void Stop() {
-    RustFunctions.stop_ticker();
+    RustMethods.stop_ticker();
   }
 
   /// <summary>
