@@ -5,12 +5,9 @@ namespace Simon.Tickers;
 
 /// <summary>
 ///   Having the Rust methods in this separate static class rather than in the
-///   <see cref="MillisecondTicker" /> class makes the difference between the ticker
-///   working and not working in the Avalonia application, even though the problem could
-///   not be reproduced in a console application or the unit tests.
-///   The reason the fix works is unclear, but may have something to do with 
-///   preventing the callback delegate from being garbage collected, which was happening
-///   in the Avalonia application at one point.
+///   <see cref="MillisecondTicker" /> class seems to make it much less likely that
+///   the ticker will sometimes stop working in an Avalonia application. However,
+///   using <see cref="Starter" /> is the decisive fix.
 /// </summary>
 internal static partial class RustMethods {
   /// <summary>
