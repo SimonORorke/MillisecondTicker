@@ -7,13 +7,13 @@ namespace Simon.Tickers;
 /// </summary>
 /// <remarks>
 ///   To prevent the callback delegate from being garbage collected,
-///   a new instance of the <see cref="Starter "/> class must created for each call of
+///   a new instance of the <see cref="Starter " /> class must created for each call of
 ///   the <see cref="Start" /> method.
 /// </remarks>
 [ExcludeFromCodeCoverage]
 internal class Starter {
   private RustMethods.CallbackDelegate _callbackDelegate = null!;
-  
+
   private bool HasStarted { get; set; }
   private Action OnTick { get; set; } = null!;
 
@@ -35,7 +35,7 @@ internal class Starter {
     _callbackDelegate = OnRustCallback;
     RustMethods.start_ticker((ulong)millisecondsInterval, _callbackDelegate);
     HasStarted = true;
-  } 
+  }
 
   /// <summary>
   ///   Runs the callback method in a separate thread.

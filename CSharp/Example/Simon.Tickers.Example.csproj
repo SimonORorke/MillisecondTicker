@@ -2,19 +2,20 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <LangVersion>14</LangVersion>
     </PropertyGroup>
 
     <!-- Copy the Rust library, if changed, to the current output folder. -->
     <!-- Commenting this out because I have not been able to work out how to make
     it vary by operating system. -->
-<!--    <ItemGroup>-->
-<!--        <Content Include="..\..\Rust\millisecond_ticker\target\release\millisecond_ticker.dll">-->
-<!--            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>-->
-<!--        </Content>-->
-<!--    </ItemGroup>-->
+    <!--    <ItemGroup>-->
+    <!--        <Content Include="..\..\Rust\millisecond_ticker\target\release\millisecond_ticker.dll">-->
+    <!--            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>-->
+    <!--        </Content>-->
+    <!--    </ItemGroup>-->
 
     <ItemGroup>
         <ProjectReference Include="..\Tickers\Simon.Tickers.csproj"/>

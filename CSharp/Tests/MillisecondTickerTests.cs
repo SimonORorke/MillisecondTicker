@@ -26,7 +26,7 @@ public class TickerTests {
   private int IntervalMilliseconds { get; set; }
   private Stopwatch Stopwatch { get; } = new Stopwatch();
   private MillisecondTicker Ticker { get; set; } = null!;
-  
+
   [Test]
   public void AllowRestart() {
     Ticker = new MillisecondTicker(OnTickMeasureTickInterval);
@@ -53,7 +53,9 @@ public class TickerTests {
   ///   interval of 1 millisecond. This test also provides an opportunity to monitor the
   ///   ticker's impact on CPU usage.
   /// </summary>
-  [Test, Explicit, ExcludeFromCodeCoverage]
+  [Test]
+  [Explicit]
+  [ExcludeFromCodeCoverage]
   public void AverageTickInterval() {
     const int sleepMilliseconds = 1000 * 600; // 10 minutes.
     // const int sleepMilliseconds = 1000 * 10; // 10 seconds.
@@ -109,7 +111,6 @@ public class TickerTests {
       $"Tested Delay, actual was {Stopwatch.ElapsedMilliseconds} milliseconds.");
   }
 
-
   [Test]
   public void InvalidInterval() {
     Ticker = new MillisecondTicker(OnTickMeasureTickInterval);
@@ -121,7 +122,9 @@ public class TickerTests {
   ///   old version of MillisecondTicker, which still fails immediately in the Avalonia
   ///   application.
   /// </summary>
-  [Test, Explicit, ExcludeFromCodeCoverage]
+  [Test]
+  [Explicit]
+  [ExcludeFromCodeCoverage]
   public void KeepCallbackDelegateAlive() {
     IntervalMilliseconds = 1000; // 1 second.
     // IntervalMilliseconds = 1000 * 60; // 1 minute.
@@ -195,7 +198,7 @@ public class TickerTests {
   ///     specified interval.  For example, if the specified interval is 1 millisecond,
   ///     tick durations are expected to be measured at 0 or 1 milliseconds. That does
   ///     not mean that those ticks whose duration was measured at 0 milliseconds actually
-  ///     occured almost immediately after the previous tick. 
+  ///     occured almost immediately after the previous tick.
   ///   </para>
   /// </remarks>
   [Test]
@@ -205,7 +208,7 @@ public class TickerTests {
     ZMeasureTickIntervals(10, 30);
     ZMeasureTickIntervals(100, 30);
     ZMeasureTickIntervals(1000, 30);
-    
+
     // The results from any one of these tests fit within the test output size limit
     // ZMeasureTickIntervals(1, 180);
     // ZMeasureTickIntervals(10, 180);
@@ -231,7 +234,7 @@ public class TickerTests {
     Thread.Sleep(sleepMilliseconds);
     // For greatest accuracy, stop the stopwatches before calling Stop() on the ticker.
     totalStopwatch.Stop();
-    Stopwatch.Stop(); 
+    Stopwatch.Stop();
     Ticker.Stop();
     long totalTickCount = Interlocked.Read(ref _tickCount);
     long expectedMilliseconds = totalTickCount * IntervalMilliseconds;
@@ -243,7 +246,8 @@ public class TickerTests {
     TestContext.Progress.WriteLine(
       $"    Expected: total tick count {totalTickCount} " +
       $"* interval {IntervalMilliseconds} = {expectedMilliseconds}");
-    TestContext.Progress.WriteLine($"    Measured: {totalStopwatch.ElapsedMilliseconds}.");
+    TestContext.Progress.WriteLine(
+      $"    Measured: {totalStopwatch.ElapsedMilliseconds}.");
     TestContext.Progress.WriteLine("************************************************");
   }
 

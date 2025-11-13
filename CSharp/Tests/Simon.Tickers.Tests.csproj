@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
-        <LangVersion>13</LangVersion>
+        <TargetFramework>net10.0</TargetFramework>
+        <LangVersion>14</LangVersion>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <Platforms>x64</Platforms>
@@ -11,13 +11,13 @@
     <!-- Copy the Rust library to the current output folder. -->
     <!-- Commenting this out because I have not been able to work out how to make
     it vary by operating system. -->
-<!--    <ItemGroup>-->
-<!--        <Content Include="..\..\Rust\millisecond_ticker\target\release\millisecond_ticker.dll">-->
-<!--            <CopyToOutputDirectory>Always</CopyToOutputDirectory>-->
-<!--&lt;!&ndash;            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>&ndash;&gt;-->
-<!--        </Content>-->
-<!--    </ItemGroup>-->
-    
+    <!--    <ItemGroup>-->
+    <!--        <Content Include="..\..\Rust\millisecond_ticker\target\release\millisecond_ticker.dll">-->
+    <!--            <CopyToOutputDirectory>Always</CopyToOutputDirectory>-->
+    <!--&lt;!&ndash;            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>&ndash;&gt;-->
+    <!--        </Content>-->
+    <!--    </ItemGroup>-->
+
     <ItemGroup>
         <PackageReference Include="NUnit" Version="4.3.2"/>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1"/>

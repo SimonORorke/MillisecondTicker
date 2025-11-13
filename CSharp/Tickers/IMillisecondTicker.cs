@@ -11,7 +11,7 @@ public interface IMillisecondTicker {
   ///   Whether the ticker is currently running.
   /// </summary>
   bool IsRunning { get; }
-  
+
   /// <summary>
   ///   Starts the ticker.
   /// </summary>
